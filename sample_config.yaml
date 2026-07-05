@@ -1,0 +1,105 @@
+# gold_qm_system — sample configuration
+# Every value below is a STARTING DEFAULT from Gold_Trading_Strategy.md Part II.
+# Validate with walk-forward testing before trusting any of them.
+
+symbol: XAUUSD
+
+account:
+  initial_equity: 100000.0
+  currency: USD
+
+timeframes:            # Part I §2.3 multi-timeframe protocol
+  directional: H4      # bias TF
+  setup: H1            # QM detection TF
+  entry: M5            # price-action trigger TF
+
+swings:                # Appendix A.1
+  swing_strength: 3    # L=R; swing is only KNOWN at bar i+R (repaint-safe)
+
+structure:             # Appendix A.2
+  range_atr_mult: 0.5
+
+qm:                    # Appendix A.3 / A.4
+  qm_lookback: 120
+  qml_atr_mult: 0.10   # qml_tol = qml_atr_mult * ATR
+  break_frac: 0.0
+  fib_entry_low: 0.618
+  fib_entry_high: 0.786
+
+price_action:          # Appendix A.5 / A.6
+  pin_wick_ratio: 0.66
+  sfp_wick_ratio: 0.5
+  compression_bars: 4
+  compression_shrink: 0.8
+
+stops_targets:         # Appendix A.7
+  stop_atr_mult: 0.25
+  min_rr: 2.0
+  use_runner: false
+  runner_fraction: 0.5
+
+indicators:
+  atr_period: 21       # EMA form, Part I §7.2
+  rsi_period: 14
+
+sizing:                # Part I §7.2 / §7.5 — final size = MIN(risk, vol, margin)
+  risk_pct: 0.005      # 0.5% of equity risked per trade (start conservative)
+  vol_pct: 0.005       # 0.5% of equity per ATR(21) unit
+  margin_pct: 0.05     # <=5% of equity as margin per position
+  margin_per_unit: 0.0 # set to broker margin per oz; 0 disables margin binding
+  min_size: 0.0
+  size_step: 0.0
+
+ongoing_risk:          # Part I §7.3 / §7.4
+  ongoing_risk_ceiling: 0.025   # trim when open risk > 2.5% of equity
+  ongoing_vol_ceiling: 0.008    # trim when ATR exposure > 0.8% of equity
+  portfolio_risk_cap: 0.125     # total open risk cap 12.5%
+
+sessions:              # Appendix F (UTC hours, [start, end))
+  asian: [0, 7]
+  london: [7, 16]
+  newyork: [13, 21]
+  overlap: [13, 16]
+  allowed_sessions: [london, newyork]
+
+regime:                # Appendix F volatility band (percentile of trailing ATR)
+  atr_pctile_window: 200
+  atr_pctile_min: 0.0
+  atr_pctile_max: 1.0
+
+costs:                 # Appendix D — gold-specific; price units = USD/oz
+  spread_asian: 0.45
+  spread_london: 0.30
+  spread_newyork: 0.30
+  spread_overlap: 0.25
+  spread_news_extra: 0.50
+  base_slippage: 0.05
+  stop_slippage_extra: 0.15
+  news_slippage_extra: 0.30
+  commission_per_unit: 0.0
+  swap_long_per_unit_day: 0.0
+  swap_short_per_unit_day: 0.0
+  swap_triple_weekday: 2   # Wednesday (0=Mon)
+  flat_by_friday: false
+
+news:                  # Appendix D
+  news_blackout_min: 30
+  calendar_csv: null   # path to CSV: timestamp_utc,impact,currency,title
+  min_impact: high
+
+kill_switches:         # Appendix G
+  daily_loss_r: 2.0
+  daily_loss_pct: 0.03
+  max_consec_losses: 4
+  spread_cap: 1.5
+  vol_cap_atr_mult: 3.0
+  max_total_dd: 0.15
+
+layers:                # ablation toggles (Appendix B.8)
+  use_structure_bias: true
+  use_qm: true
+  use_fib_zone: true
+  use_price_action: true
+  use_sfp_booster: true
+  require_htf_bias_alignment: true
+  allow_countertrend_on_mss: true

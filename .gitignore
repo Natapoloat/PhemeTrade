@@ -1,0 +1,18 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+build/
+dist/
+# large market data — supply your own, don't commit
+market_data/
+*.parquet
+# generated outputs
+output/
+reports_out/
+*.png
+!docs/**/*.png
+.coverage
+htmlcov/

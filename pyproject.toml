@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gold-qm-system"
+version = "0.1.0"
+description = "Rule-based XAUUSD (gold) Quasimodo/smart-money trading system with anti-lookahead event-driven backtesting. Research software; not financial advice."
+requires-python = ">=3.11"
+dependencies = [
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "pydantic>=2.0",
+    "pyyaml>=6.0",
+    "matplotlib>=3.7",
+    "typer>=0.9",
+    "rich>=13.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+gold-qm = "gold_qm_system.cli:app"
+
+[tool.setuptools.packages.find]
+include = ["gold_qm_system*"]
+
+[tool.pytest.ini_options]
+testpaths = ["gold_qm_system/tests"]
+addopts = "-q"
