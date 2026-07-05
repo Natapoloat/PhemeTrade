@@ -11,12 +11,21 @@ automation, and the interpretation chosen. Spec references in parentheses.
 
 2. **"Last two SH/SL" for bias (A.2).** Bias needs at least 2 confirmed SH *and*
    2 confirmed SL. Before that, bias = Ranging (no trades that require bias).
-   The Ranging tie-break (`|ΔSH| < range_atr_mult*ATR` or `|ΔSL| < …`) uses ATR
-   as of the moment the later swing was *confirmed*, not formed — no future ATR.
+   The Ranging tie-break uses ATR as of the moment the later swing was
+   *confirmed*, not formed — no future ATR. "Last SH/SL differ by less than
+   `range_atr_mult*ATR`" is read as: Ranging when BOTH `|ΔSH| < tol` AND
+   `|ΔSL| < tol` (both sides flat = a range; a one-sided flat with the other
+   side expanding is still resolved by the ascending/descending rule, which
+   already requires BOTH sides to agree for a trend).
 
-3. **"Major swing" for MSS (A.2).** A swing is *major* if a later close broke it
-   in the trend direction (i.e., it produced a BOS). MSS = close beyond the most
-   recent major swing against the old trend. This flips `bias` on that bar close.
+3. **"Major swing" for MSS (A.2).** "A swing that itself produced a BOS" is read
+   as the ORIGIN swing of the breaking impulse: when a BOS occurs in an uptrend
+   (close > last confirmed SH), the most recent confirmed SL before that break
+   becomes the *major low* (the impulse that broke the high originated from it).
+   MSS = close beyond the current major swing against the old trend; this flips
+   `bias` on that bar close. Mirror for downtrends. CHoCH = first close beyond
+   the most recent confirmed counter-side swing since the last BOS; the CHoCH
+   flag re-arms after each new BOS.
 
 4. **QM point ordering (A.3).** Points 2/3/4/5 must be strictly time-ordered by
    their swing bar index (not confirmation index), but the pattern only becomes
