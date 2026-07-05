@@ -120,11 +120,18 @@ automation, and the interpretation chosen. Spec references in parentheses.
     on closed bars only.
 
 23. **QM point selection (A.3).** When a new swing confirms as candidate
-    point 5, points 4/3/2 are the most recent alternating prior swings:
-    pt4 = last SH before pt5, pt3 = last SL before pt4, pt2 = last SH before
-    pt3 (sell; mirror for buy). The pass of price THROUGH the QML during the
-    head→under leg is pattern formation, not a "touch"; the freshness clock
-    starts strictly after the point-5 bar.
+    point 5 (sell; mirror for buy): pt4 (head) = the last SH before pt5;
+    pt2 (left shoulder / QML) = the MOST RECENT SH before the head whose high
+    the head broke ("a confirmed SH" per A.3 — any within `qm_lookback` of
+    pt5, we take the freshest such level); pt3 (neck) = the FIRST SL after
+    pt2 and before the head (A.3's "the confirmed SL after point 2"); Under =
+    pt5 breaks the neck. (An earlier draft required the four swings to be
+    strictly adjacent/alternating; that was stricter than the spec text and
+    made valid QMs nearly unfindable on real data — relaxed 2026-07-06, still
+    taking only the most recent qualifying shoulder for determinism.)
+    The pass of price THROUGH the QML during the head→under leg is pattern
+    formation, not a "touch"; the freshness clock starts strictly after the
+    point-5 bar.
 
 24. **Pre-entry invalidation.** After a pattern is tradeable, a CLOSE beyond
     the head (sell: close > head high; buy: close < head low) invalidates it —

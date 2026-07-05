@@ -114,39 +114,47 @@ class QMDetector:
         return None
 
     def _try_form(self, direction: QMDirection, pt5: SwingPoint, atr_val: float) -> Optional[QMPattern]:
-        """pt5 just confirmed; walk back alternating swings (DECISIONS #23)."""
+        """pt5 just confirmed. Per A.3 / DECISIONS #23: pt4 (head) is the last
+        opposite-extreme swing before pt5; pt2 (left shoulder) is the MOST
+        RECENT prior swing whose level the head broke ('Over'), within
+        qm_lookback of pt5; pt3 (neck) is the FIRST counter swing after pt2
+        and before the head; pt5 must break the neck ('Under')."""
         bf = self.cfg.break_frac
+        lb = self.cfg.qm_lookback
         if direction == "sell":
             pt4 = self._last_before(self._highs, pt5.index)
             if pt4 is None:
                 return None
-            pt3 = self._last_before(self._lows, pt4.index)
-            if pt3 is None:
-                return None
-            pt2 = self._last_before(self._highs, pt3.index)
+            pt2 = next((s for s in reversed(self._highs)
+                        if s.index < pt4.index
+                        and pt5.index - s.index <= lb
+                        and pt4.price >= s.price * (1 + bf) and pt4.price > s.price),
+                       None)                     # Over: head broke this LS high
             if pt2 is None:
                 return None
-            if not (pt4.price >= pt2.price * (1 + bf) and pt4.price > pt2.price):
-                return None                      # no Over: head must break LS high
+            pt3 = next((s for s in self._lows if pt2.index < s.index < pt4.index),
+                       None)                     # neck: first SL after pt2 (A.3)
+            if pt3 is None:
+                return None
             if not (pt5.price <= pt3.price * (1 - bf) and pt5.price < pt3.price):
                 return None                      # no Under: must break the neck
         else:
             pt4 = self._last_before(self._lows, pt5.index)
             if pt4 is None:
                 return None
-            pt3 = self._last_before(self._highs, pt4.index)
-            if pt3 is None:
-                return None
-            pt2 = self._last_before(self._lows, pt3.index)
+            pt2 = next((s for s in reversed(self._lows)
+                        if s.index < pt4.index
+                        and pt5.index - s.index <= lb
+                        and pt4.price <= s.price * (1 - bf) and pt4.price < s.price),
+                       None)                     # Under-grab below the LS low
             if pt2 is None:
                 return None
-            if not (pt4.price <= pt2.price * (1 - bf) and pt4.price < pt2.price):
+            pt3 = next((s for s in self._highs if pt2.index < s.index < pt4.index),
+                       None)
+            if pt3 is None:
                 return None
             if not (pt5.price >= pt3.price * (1 + bf) and pt5.price > pt3.price):
                 return None
-
-        if pt5.index - pt2.index > self.cfg.qm_lookback:
-            return None
 
         qml = pt2.price
         qml_tol = self.cfg.qml_atr_mult * atr_val   # FROZEN now (DECISIONS #5)

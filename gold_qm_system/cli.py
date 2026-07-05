@@ -86,7 +86,7 @@ def backtest(config: Path = typer.Option(..., help="YAML config"),
     out = _outdir(output, "backtest")
     write_report(stats, res.equity_curve, out)
     write_journal(res.trades, out / "journal.csv")
-    _print_stats(stats, f"Backtest {bars.index[0]:%Y-%m-%d} → {bars.index[-1]:%Y-%m-%d}")
+    _print_stats(stats, f"Backtest {bars.index[0]:%Y-%m-%d} .. {bars.index[-1]:%Y-%m-%d}")
     if res.halted:
         console.print("[red bold]RUN HALTED by equity-floor kill switch[/]")
     console.print(f"report: {out / 'report.md'}")

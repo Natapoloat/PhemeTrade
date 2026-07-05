@@ -84,6 +84,22 @@ def test_invalid_under_does_not_break_neck():
     assert det.on_swing(sw("low", 25, 101), 2.0) is None      # 101 > neck 100
 
 
+def test_non_adjacent_left_shoulder_is_found():
+    """DECISIONS #23 (revised): the LS need not be the swing immediately
+    before the neck — an intervening HIGHER swing high (not broken by the
+    head) is skipped and the freshest BROKEN level becomes the QML."""
+    det = QMDetector(QMConfig())
+    det.on_swing(sw("high", 5, 110), 2.0)     # true LS: broken by the head
+    det.on_swing(sw("low", 8, 102), 2.0)      # neck (first SL after LS)
+    det.on_swing(sw("high", 12, 118), 2.0)    # intervening SH ABOVE the head
+    det.on_swing(sw("low", 15, 104), 2.0)
+    det.on_swing(sw("high", 20, 115), 2.0)    # head: breaks 110, not 118
+    pat = det.on_swing(sw("low", 25, 95), 2.0)
+    assert pat is not None and pat.direction == "sell"
+    assert pat.qml == 110                      # 118 skipped: head never broke it
+    assert pat.neck.price == 102
+
+
 def test_lookback_exceeded_rejects_pattern():
     det = QMDetector(QMConfig(qm_lookback=10))                # pt5-pt2 = 15 > 10
     assert feed_sell_qm(det) is None
