@@ -130,6 +130,22 @@ automation, and the interpretation chosen. Spec references in parentheses.
     the head (sell: close > head high; buy: close < head low) invalidates it —
     the level that would have been the stop is gone.
 
+25. **Volatility-sizing ATR (Part I §7.2 "ATR(21) daily basis").** The engine
+    uses the DIRECTIONAL-TF ATR(21) for volatility sizing and the ongoing
+    volatility ceiling (H4 by default; configure `timeframes.directional: D1`
+    for a literal daily ATR). Rationale: it is the coarsest TF the strategy
+    already maintains causally; requiring a separate D1 stream would duplicate
+    state without changing behavior materially. The QML tolerance (A.3) and
+    stop buffer (A.7) use the SETUP-TF ATR, since both are properties of
+    setup-TF structures. The volatility circuit breaker (App. G) compares the
+    entry-TF true range to the entry-TF ATR.
+
+26. **Engine bar streams.** The strategy consumes ONLY entry-TF bars; setup and
+    directional bars are built internally by an incremental aggregator that
+    emits a bucket exactly when its close time is reached. Backtest and live
+    runners therefore share one code path, and unclosed-HTF leakage is
+    impossible by construction (complements the analysis-side aligner, B.3).
+
 21. **ATR formula (Part I §7.2).** The spec's literal text — "ATR = Yesterday's
     ATR + (Expo. Avg Factor × Today's True Range)" — omits the EMA decay term
     and would grow without bound. Implemented as the standard EMA recursion the

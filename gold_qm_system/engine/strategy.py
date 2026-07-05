@@ -197,7 +197,7 @@ class QMStrategy:
             return self._skip(time, "regime:atr_pctile")
 
         if lay.use_qm:
-            self._enter_qm(time, close, sess, rsi_val)
+            self._enter_qm(time, close, sess, rsi_val, atr_pctile)
         else:
             self._enter_structure_only(time, close, sess)   # ablation baseline (B.8)
 
@@ -220,7 +220,7 @@ class QMStrategy:
         return False
 
     def _enter_qm(self, time: pd.Timestamp, close: float, sess: str,
-                  rsi_val: Optional[float]) -> None:
+                  rsi_val: Optional[float], atr_pctile: Optional[float]) -> None:
         cur = self._entry_bars[-1]
         setup_idx = self.setup.bar_count - 1
         candidates = self.setup.qm.active_patterns(setup_idx)
@@ -239,7 +239,7 @@ class QMStrategy:
                                       self.cfg.price_action.pin_wick_ratio)
                 if trigger is None:
                     continue
-            self._submit(time, close, pat, trigger, sess, rsi_val)
+            self._submit(time, close, pat, trigger, sess, rsi_val, atr_pctile)
             pat.status = "stale"                               # the retest is being traded
             return                                             # one entry per bar
 
@@ -260,7 +260,8 @@ class QMStrategy:
             return
 
     def _submit(self, time: pd.Timestamp, close: float, pat: QMPattern,
-                trigger: Optional[str], sess: str, rsi_val: Optional[float]) -> None:
+                trigger: Optional[str], sess: str, rsi_val: Optional[float],
+                atr_pctile: Optional[float]) -> None:
         atr_setup = self.setup.atr.value or 0.0
         stop, target = build_stop_and_target(
             pat.direction, close, pat.stop_extreme, atr_setup,
@@ -284,6 +285,7 @@ class QMStrategy:
             "bias_directional": self.directional.structure.bias,
             "bias_setup": self.setup.structure.bias,
             "rsi_entry_tf": rsi_val,
+            "atr_pctile_entry": atr_pctile,
             "atr_setup_tf": atr_setup,
             "tf_bias": self.cfg.timeframes.directional,
             "tf_setup": self.cfg.timeframes.setup,
