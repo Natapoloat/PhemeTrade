@@ -31,7 +31,6 @@ from .broker import (
     ExitReason,
     Position,
     TradeRecord,
-    next_position_id,
 )
 
 
@@ -68,6 +67,7 @@ class SimBroker(BrokerAdapter):
         self.trades: list[TradeRecord] = []
         self.slippage_log: list[dict[str, Any]] = []
         self._last_bar_time: Optional[pd.Timestamp] = None
+        self._next_pos_id = 1
 
     # ------------------------------------------------ BrokerAdapter interface
     def submit_market(self, direction, size, stop, target, risk_amount, meta):
@@ -112,8 +112,9 @@ class SimBroker(BrokerAdapter):
         # 1) pending market entries fill at this bar's open
         for pe in self._pending_entries:
             px = open_ + half + entry_slip if pe.direction == "buy" else open_ - half - entry_slip
-            pos = Position(next_position_id(), pe.direction, pe.size, px, pe.stop,
+            pos = Position(self._next_pos_id, pe.direction, pe.size, px, pe.stop,
                            pe.target, time, pe.risk_amount, pe.meta)
+            self._next_pos_id += 1
             self._positions[pos.pos_id] = pos
             led = _CostLedger()
             self._charge(led, self.costs.commission_per_unit * pe.size)

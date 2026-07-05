@@ -8,7 +8,6 @@ this interface).
 from __future__ import annotations
 
 import abc
-import itertools
 from dataclasses import dataclass, field
 from typing import Any, Literal, Optional
 
@@ -81,8 +80,3 @@ class BrokerAdapter(abc.ABC):
         """Equity including unrealized PnL — the kill-switch/drawdown view."""
 
 
-_id_counter = itertools.count(1)
-
-
-def next_position_id() -> int:
-    return next(_id_counter)
