@@ -112,6 +112,24 @@ automation, and the interpretation chosen. Spec references in parentheses.
     if the setup-TF prints a CHoCH against an open position, the position is
     closed at the next bar open. Simple, testable, and traceable to §8.2.
 
+22. **"Price inside the entry zone" (A.4) at bar close.** A pin bar rejecting
+    the zone typically CLOSES outside it (the wick did the touching), so
+    requiring close-inside-zone would reject the very trigger A.5 describes.
+    Armed (sell) = bar's HIGH reached the zone (`high >= zone_lo`) AND the bar
+    did not close through it (`close <= zone_hi`). Mirror for buys. Evaluated
+    on closed bars only.
+
+23. **QM point selection (A.3).** When a new swing confirms as candidate
+    point 5, points 4/3/2 are the most recent alternating prior swings:
+    pt4 = last SH before pt5, pt3 = last SL before pt4, pt2 = last SH before
+    pt3 (sell; mirror for buy). The pass of price THROUGH the QML during the
+    head→under leg is pattern formation, not a "touch"; the freshness clock
+    starts strictly after the point-5 bar.
+
+24. **Pre-entry invalidation.** After a pattern is tradeable, a CLOSE beyond
+    the head (sell: close > head high; buy: close < head low) invalidates it —
+    the level that would have been the stop is gone.
+
 21. **ATR formula (Part I §7.2).** The spec's literal text — "ATR = Yesterday's
     ATR + (Expo. Avg Factor × Today's True Range)" — omits the EMA decay term
     and would grow without bound. Implemented as the standard EMA recursion the
