@@ -102,3 +102,10 @@ automation, and the interpretation chosen. Spec references in parentheses.
     discretionary language; v1 implements it as a config-less always-on rule:
     if the setup-TF prints a CHoCH against an open position, the position is
     closed at the next bar open. Simple, testable, and traceable to §8.2.
+
+21. **ATR formula (Part I §7.2).** The spec's literal text — "ATR = Yesterday's
+    ATR + (Expo. Avg Factor × Today's True Range)" — omits the EMA decay term
+    and would grow without bound. Implemented as the standard EMA recursion the
+    source (Basso) clearly intends: `ATR_t = ATR_{t-1} + k·(TR_t − ATR_{t-1})`,
+    `k = 2/(N+1)`, seeded with `ATR_0 = TR_0`. Causal; prefix-consistency is
+    enforced by test.
