@@ -304,6 +304,7 @@ class QMStrategy:
         if sizing.binding == "skipped":
             return self._skip(time, "sizing_skipped")
         meta = dict(meta)
+        meta["signal_close"] = close
         meta["binding_method"] = sizing.binding
         meta["sizing"] = {"risk": sizing.size_risk, "vol": sizing.size_vol,
                           "margin": sizing.size_margin}

@@ -106,10 +106,13 @@ def run_backtest(cfg: SystemConfig, entry_bars: pd.DataFrame,
 
 def run_feed(cfg: SystemConfig, feed: Iterable[tuple[pd.Timestamp, float, float, float, float]],
              calendar: Optional[NewsCalendar] = None,
-             on_event: Optional[Any] = None) -> RunResult:
-    """Paper/forward-test: identical loop, bars arrive from a real-time feed.
+             on_event: Optional[Any] = None,
+             broker: Optional[Any] = None) -> RunResult:
+    """Paper/forward-test (default SimBroker) or LIVE (inject a real
+    BrokerAdapter): identical loop, bars arrive from a real-time feed.
     The feed must yield CLOSED entry-TF bars (open_time, o, h, l, c)."""
-    broker = SimBroker(cfg.account.initial_equity, cfg.costs)
+    if broker is None:
+        broker = SimBroker(cfg.account.initial_equity, cfg.costs)
     return _run_core(cfg, feed, broker, calendar, on_event=on_event)
 
 

@@ -79,4 +79,13 @@ class BrokerAdapter(abc.ABC):
     def mark_to_market_equity(self, price: float) -> float:
         """Equity including unrealized PnL — the kill-switch/drawdown view."""
 
+    @abc.abstractmethod
+    def process_bar(self, time: pd.Timestamp, open_: float, high: float, low: float,
+                    close: float, spread: float, in_news: bool) -> list["TradeRecord"]:
+        """Per-bar sync point called by the engine BEFORE strategy decisions:
+        the simulator fills queued orders / checks stops here; a REAL adapter
+        implements it by polling the venue for fills since the last bar and
+        returning them as TradeRecords. Implementations must also maintain
+        `.trades: list[TradeRecord]` and `.slippage_log: list[dict]`."""
+
 
