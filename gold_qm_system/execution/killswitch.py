@@ -37,6 +37,7 @@ class KillSwitchMonitor:
     _last_tr_over_atr: float = field(default=0.0, init=False)
     hard_stopped: bool = field(default=False, init=False)
     consec_paused: bool = field(default=False, init=False)
+    _pause_started: Optional[pd.Timestamp] = field(default=None, init=False)
 
     def __post_init__(self):
         self._peak_equity = self.initial_equity
@@ -51,6 +52,11 @@ class KillSwitchMonitor:
             self._daily_r = 0.0
             self._daily_pnl = 0.0
             self._day_start_equity = realized_equity
+        # timed auto-resume of the consecutive-loss pause (DECISIONS #27):
+        # the config's consec_pause_days stands in for 'manual review'
+        if (self.consec_paused and self._pause_started is not None
+                and time - self._pause_started >= pd.Timedelta(days=self.cfg.consec_pause_days)):
+            self.reset_consecutive_pause()
         self._last_spread = spread
         self._last_tr_over_atr = (true_range / atr_value) if atr_value > 0 else 0.0
         self._peak_equity = max(self._peak_equity, mtm_equity)
@@ -66,14 +72,16 @@ class KillSwitchMonitor:
             if trade.net_pnl < 0:
                 self._consec_losses += 1
                 if self._consec_losses >= self.cfg.max_consec_losses:
-                    self.consec_paused = True   # sticky: needs manual reset/review
+                    self.consec_paused = True   # pauses for consec_pause_days
+                    self._pause_started = trade.exit_time
             elif trade.net_pnl > 0:
                 self._consec_losses = 0
 
     def reset_consecutive_pause(self) -> None:
-        """Manual-review acknowledgment (Appendix G)."""
+        """Review acknowledgment (Appendix G) — manual, or timed auto-resume."""
         self.consec_paused = False
         self._consec_losses = 0
+        self._pause_started = None
 
     # --------------------------------------------------------------- queries
     def allow_new_entries(self) -> tuple[bool, Optional[str]]:

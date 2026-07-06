@@ -68,6 +68,7 @@ class SimBroker(BrokerAdapter):
         self.slippage_log: list[dict[str, Any]] = []
         self._last_bar_time: Optional[pd.Timestamp] = None
         self._next_pos_id = 1
+        self.rejected_entries: list[dict[str, Any]] = []  # gap-rejected orders (DECISIONS #28)
 
     # ------------------------------------------------ BrokerAdapter interface
     def submit_market(self, direction, size, stop, target, risk_amount, meta):
@@ -112,6 +113,18 @@ class SimBroker(BrokerAdapter):
         # 1) pending market entries fill at this bar's open
         for pe in self._pending_entries:
             px = open_ + half + entry_slip if pe.direction == "buy" else open_ - half - entry_slip
+            # gap sanity (DECISIONS #28): if the fill would land at/beyond the
+            # target (move already happened) or at/beyond the stop (entering
+            # straight into a stop-out), REJECT the order instead of chasing.
+            if pe.direction == "buy":
+                gapped = px >= pe.target or px <= pe.stop
+            else:
+                gapped = px <= pe.target or px >= pe.stop
+            if gapped:
+                self.rejected_entries.append({"time": time, "direction": pe.direction,
+                                              "would_fill": px, "stop": pe.stop,
+                                              "target": pe.target, "meta": pe.meta})
+                continue
             pos = Position(self._next_pos_id, pe.direction, pe.size, px, pe.stop,
                            pe.target, time, pe.risk_amount, pe.meta)
             self._next_pos_id += 1

@@ -152,6 +152,7 @@ class KillSwitchConfig(BaseModel):
     daily_loss_r: float = Field(2.0, gt=0.0, description="halt new entries after this many R lost in a day")
     daily_loss_pct: float = Field(0.03, gt=0.0, description="halt after this fraction of equity lost in a day")
     max_consec_losses: int = Field(4, ge=1)
+    consec_pause_days: int = Field(5, ge=1, description="pause duration simulating manual review; auto-resumes after")
     spread_cap: float = Field(1.5, gt=0.0, description="skip entries when live spread exceeds this (price units)")
     vol_cap_atr_mult: float = Field(3.0, gt=0.0, description="skip entries when bar true range > mult * ATR")
     max_total_dd: float = Field(0.15, gt=0.0, description="hard stop the system at this peak-to-trough drawdown")

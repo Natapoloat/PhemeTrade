@@ -208,18 +208,54 @@ def test_daily_loss_pct_limit():
     assert not ok and why == "daily_loss_pct_limit"
 
 
-def test_consecutive_losses_pause_is_sticky_until_reset():
-    m = KillSwitchMonitor(kcfg(max_consec_losses=3), 100_000)
+def test_consecutive_losses_pause_holds_then_auto_resumes():
+    """DECISIONS #27: the pause holds for consec_pause_days (simulated manual
+    review) then auto-resumes with the loss counter reset."""
+    m = KillSwitchMonitor(kcfg(max_consec_losses=3, consec_pause_days=5), 100_000)
     m.on_bar(ts(0), 100_000, 100_000, 0.3, 1.0, 5.0)
     for i in range(3):
         m.on_bar(ts(i * 30), 100_000, 100_000, 0.3, 1.0, 5.0)  # spread days out
         m.on_trade_closed(loss_trade(r=-0.1, pnl=-100.0))
+    pause_start = loss_trade().exit_time                        # ts(1)
     ok, why = m.allow_new_entries()
     assert not ok and why == "consecutive_losses_pause"
-    m.on_bar(ts(100 * 24), 100_000, 100_000, 0.3, 1.0, 5.0)    # days pass: still paused
+    # still paused within the window
+    m.on_bar(pause_start + pd.Timedelta(days=4), 100_000, 100_000, 0.3, 1.0, 5.0)
     assert not m.allow_new_entries()[0]
+    # auto-resumes after consec_pause_days; one new loss does NOT re-latch
+    m.on_bar(pause_start + pd.Timedelta(days=5, hours=1), 100_000, 100_000, 0.3, 1.0, 5.0)
+    assert m.allow_new_entries()[0]
+    m.on_trade_closed(loss_trade(r=-0.1, pnl=-100.0))
+    assert m.allow_new_entries()[0]
+
+
+def test_consecutive_losses_manual_reset_still_works():
+    m = KillSwitchMonitor(kcfg(max_consec_losses=2, consec_pause_days=5), 100_000)
+    m.on_bar(ts(0), 100_000, 100_000, 0.3, 1.0, 5.0)
+    m.on_trade_closed(loss_trade(r=-0.1, pnl=-100.0))
+    m.on_trade_closed(loss_trade(r=-0.1, pnl=-100.0))
+    assert m.allow_new_entries() == (False, "consecutive_losses_pause")
     m.reset_consecutive_pause()
     assert m.allow_new_entries()[0]
+
+
+def test_entry_gap_through_target_or_stop_is_rejected():
+    """DECISIONS #28: don't chase a runaway open past the order's own target,
+    and don't enter straight into a stop-out."""
+    b = SimBroker(100_000, costs())
+    # buy queued with target 2010; next bar opens ABOVE the target -> reject
+    open_long(b, size=10.0, stop=1990.0, target=2010.0)
+    b.process_bar(ts(0), 2015.0, 2016.0, 2014.0, 2015.5, 0.30, False)
+    assert b.open_positions() == [] and len(b.rejected_entries) == 1
+    assert b.rejected_entries[0]["would_fill"] >= 2010.0
+    # buy queued with stop 1990; next bar opens BELOW the stop -> reject
+    open_long(b, size=10.0, stop=1990.0, target=2010.0)
+    b.process_bar(ts(1), 1985.0, 1986.0, 1984.0, 1985.5, 0.30, False)
+    assert b.open_positions() == [] and len(b.rejected_entries) == 2
+    # normal open between stop and target -> fills
+    open_long(b, size=10.0, stop=1990.0, target=2010.0)
+    b.process_bar(ts(2), 2000.0, 2001.0, 1999.0, 2000.5, 0.30, False)
+    assert len(b.open_positions()) == 1 and len(b.rejected_entries) == 2
 
 
 def test_trim_exits_do_not_count_as_losses():

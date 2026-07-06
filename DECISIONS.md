@@ -153,6 +153,22 @@ automation, and the interpretation chosen. Spec references in parentheses.
     runners therefore share one code path, and unclosed-HTF leakage is
     impossible by construction (complements the analysis-side aligner, B.3).
 
+27. **Consecutive-loss pause duration (App. G).** The spec says "pause ... for
+    manual review" without a duration. A permanently sticky pause made a
+    21-year backtest halt in month 4 and idle for two decades — measuring the
+    latch, not the strategy. Implemented as a TIMED pause
+    (`kill_switches.consec_pause_days`, default 5) that auto-resumes with the
+    loss counter reset, standing in for the review. In live operation the
+    operator can still extend/act during those days; found 2026-07-06 on the
+    2004–2026 dataset.
+
+28. **Gap-through-target/stop entry rejection.** A market order queued at
+    signal close whose NEXT-bar fill would land at/beyond its own target
+    (the move already happened) or at/beyond its stop (instant stop-out) is
+    REJECTED, not chased (`SimBroker.rejected_entries`). Found via a real
+    2004 trade that "hit target" for −0.19R after gapping past the target at
+    entry. A live adapter should implement the same pre-trade sanity check.
+
 21. **ATR formula (Part I §7.2).** The spec's literal text — "ATR = Yesterday's
     ATR + (Expo. Avg Factor × Today's True Range)" — omits the EMA decay term
     and would grow without bound. Implemented as the standard EMA recursion the
