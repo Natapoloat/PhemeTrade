@@ -151,20 +151,57 @@ class QMStrategy:
                 self.broker.request_close(pos.pos_id, None, "flat_friday")
             return
 
-        # CHoCH/MSS against an open position -> close at next open (DECISIONS #20)
+        st = self.cfg.stops_targets
+        # CHoCH/MSS against an open position -> close at next open (DECISIONS #20;
+        # gated by use_choch_exit per Appendix J.2)
         against = {("buy", "down"), ("sell", "up")}
         counter_events = [ev for ev in self.setup.last_events
                           if ev.kind in ("CHOCH", "MSS")]
         for pos in positions:
-            if any((pos.direction, ev.direction) in against for ev in counter_events):
+            if st.use_choch_exit and any(
+                    (pos.direction, ev.direction) in against for ev in counter_events):
                 self.broker.request_close(pos.pos_id, None, "choch_exit")
                 continue
+
+            # breakeven rule (Appendix J.2) — both exit modes
+            if st.be_trigger_r > 0 and not pos.meta.get("be_done"):
+                rpu = abs(pos.entry_price - pos.meta.get("init_stop", pos.stop))
+                fav = (close - pos.entry_price) if pos.direction == "buy" \
+                    else (pos.entry_price - close)
+                if rpu > 0 and fav >= st.be_trigger_r * rpu:
+                    self._tighten(pos, pos.entry_price)
+                    pos.meta["be_done"] = True
+
+            # structural trailing stop (Appendix J.2) — trail_structure mode only
+            if st.exit_mode == "trail_structure":
+                self._trail_structure(pos, st.stop_atr_mult)
+
             # ongoing risk / volatility ceilings (Part I 7.3) — trim, don't exit
             state = OpenPositionState(pos.direction, pos.size, pos.stop)
             trim = ongoing_trim_size(state, close, self._vol_atr(),
                                      self.broker.equity(), self.cfg.ongoing_risk)
             if trim > 0:
                 self.broker.request_close(pos.pos_id, trim, "trim")
+
+    def _tighten(self, pos, new_stop: float) -> None:
+        """Move a stop only in the risk-reducing direction (broker also enforces
+        this; we guard to avoid the ValueError on a no-op/loosening call)."""
+        tighter = (new_stop > pos.stop) if pos.direction == "buy" else (new_stop < pos.stop)
+        if tighter:
+            self.broker.modify_stop(pos.pos_id, new_stop)
+
+    def _trail_structure(self, pos, stop_atr_mult: float) -> None:
+        """Trail behind the most recent CONFIRMED setup-TF swing in favor
+        (repaint-safe; causal). Buffer = stop_atr_mult * setup-TF ATR."""
+        buffer = stop_atr_mult * (self.setup.atr.value or 0.0)
+        if pos.direction == "buy":
+            lows = self.setup.structure.swing_lows
+            if lows:
+                self._tighten(pos, lows[-1].price - buffer)
+        else:
+            highs = self.setup.structure.swing_highs
+            if highs:
+                self._tighten(pos, highs[-1].price + buffer)
 
     def _vol_atr(self) -> float:
         """ATR used for volatility sizing / ceilings: directional-TF ATR
@@ -255,7 +292,8 @@ class QMStrategy:
             atr_setup = self.setup.atr.value or 0.0
             stop, target = build_stop_and_target(
                 direction, close, ev.level, atr_setup,
-                self.cfg.stops_targets.stop_atr_mult, self.cfg.stops_targets.min_rr)
+                self.cfg.stops_targets.stop_atr_mult, self.cfg.stops_targets.min_rr,
+                self.cfg.stops_targets.exit_mode)
             self._submit_order(time, close, direction, stop, target,
                                meta={"setup": "mss_structure_only", "session": sess})
             return
@@ -266,7 +304,8 @@ class QMStrategy:
         atr_setup = self.setup.atr.value or 0.0
         stop, target = build_stop_and_target(
             pat.direction, close, pat.stop_extreme, atr_setup,
-            self.cfg.stops_targets.stop_atr_mult, self.cfg.stops_targets.min_rr)
+            self.cfg.stops_targets.stop_atr_mult, self.cfg.stops_targets.min_rr,
+            self.cfg.stops_targets.exit_mode)
         bars = list(self._entry_bars)
         meta = {
             "setup": "qm",
@@ -307,6 +346,7 @@ class QMStrategy:
             return self._skip(time, "sizing_skipped")
         meta = dict(meta)
         meta["signal_close"] = close
+        meta["init_stop"] = stop          # frozen initial stop for R math (Appendix J.2)
         meta["binding_method"] = sizing.binding
         meta["sizing"] = {"risk": sizing.size_risk, "vol": sizing.size_vol,
                           "margin": sizing.size_margin}

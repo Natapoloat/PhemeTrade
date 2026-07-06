@@ -97,6 +97,18 @@ def test_stop_and_target_buy():
     assert target == 90.0 + 2.0 * 5.5
 
 
+def test_trail_structure_mode_has_no_fixed_target():
+    """Appendix J.2: trail_structure returns an infinite target (exits come
+    from the trailing stop), while the stop is identical to fixed mode."""
+    import math
+    s_stop, s_tgt = build_stop_and_target("sell", 110.0, 115.0, 2.0, 0.25, 2.0,
+                                          exit_mode="trail_structure")
+    assert s_stop == 115.5 and s_tgt == -math.inf
+    b_stop, b_tgt = build_stop_and_target("buy", 90.0, 85.0, 2.0, 0.25, 2.0,
+                                          exit_mode="trail_structure")
+    assert b_stop == 84.5 and b_tgt == math.inf
+
+
 # ------------------------------------------------- ongoing ceilings (7.3)
 
 def test_ongoing_risk_ceiling_trims_to_exact_ceiling():

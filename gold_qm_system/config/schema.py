@@ -71,12 +71,21 @@ class PriceActionConfig(BaseModel):
 
 
 class StopsTargetsConfig(BaseModel):
-    """Appendix A.7 — stops and targets."""
+    """Appendix A.7 (stops/targets) + Appendix J (exit-geometry iteration 2)."""
 
     stop_atr_mult: float = Field(0.25, ge=0.0, description="stop buffer = stop_atr_mult * ATR beyond swing extreme")
-    min_rr: float = Field(2.0, gt=0.0, description="minimum reward:risk (T1)")
+    min_rr: float = Field(2.0, gt=0.0, description="fixed-mode take-profit at min_rr * risk (Appendix A.7 / J.2)")
     use_runner: bool = Field(False, description="optional runner to T2 (next opposing zone)")
     runner_fraction: float = Field(0.5, ge=0.0, le=1.0)
+    # Appendix J.2 — configurable exit mechanics
+    exit_mode: Literal["fixed_rr", "trail_structure"] = Field(
+        "fixed_rr", description="J.2: fixed take-profit vs structural trailing stop (no target)")
+    be_trigger_r: float = Field(
+        0.0, ge=0.0,
+        description="J.2: move stop to entry once +be_trigger_r*R reached (0 = off)")
+    use_choch_exit: bool = Field(
+        True, description="J.2: counter-CHoCH force-closes the position (Part I 8.2); "
+                          "False lets the trail/target run")
 
 
 class IndicatorConfig(BaseModel):

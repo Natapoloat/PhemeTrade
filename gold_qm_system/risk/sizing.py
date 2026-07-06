@@ -77,16 +77,18 @@ def build_stop_and_target(
     atr_value: float,
     stop_atr_mult: float,
     min_rr: float,
+    exit_mode: Literal["fixed_rr", "trail_structure"] = "fixed_rr",
 ) -> tuple[float, float]:
-    """Appendix A.7: stop beyond the swing extreme with an ATR buffer;
-    T1 target at min_rr multiples of the stop distance."""
+    """Appendix A.7 / J.2: stop beyond the swing extreme with an ATR buffer.
+    fixed_rr -> take-profit at min_rr * risk. trail_structure -> no fixed
+    target (returns +/-inf; exits come from the trailing stop, Appendix J.2)."""
     buffer = stop_atr_mult * atr_value
     if direction == "sell":
         stop = swing_extreme + buffer
         risk = stop - entry
-        target = entry - min_rr * risk
+        target = -math.inf if exit_mode == "trail_structure" else entry - min_rr * risk
     else:
         stop = swing_extreme - buffer
         risk = entry - stop
-        target = entry + min_rr * risk
+        target = math.inf if exit_mode == "trail_structure" else entry + min_rr * risk
     return stop, target

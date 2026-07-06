@@ -354,3 +354,32 @@ gold_qm_system/
 5. **Regime & session tagging** — gold's character changes across macro regimes; an unconditional edge claim is suspect.
 6. **Kill-switches** — the original doc manages per-trade risk well but had no portfolio-level circuit breaker for a bad day / broken market.
 7. **Shared code path for backtest and live** — the only reliable way to keep forward-test honest.
+
+---
+
+# PART III — DESIGN ITERATION 2: EXIT GEOMETRY
+> Added 2026-07-07 after Iteration 1 (fixed 2R target) failed validation on 21.6 years of gold M15 data (OOS expectancy −0.20R, PF 0.67 under walk-forward across band-width / Fib-veto / trigger-set variations). This part revises the *exit* design only; entry logic (Part I §§2–6, Appendix A.1–A.6) is unchanged. Part II's anti-lookahead, cost and validation requirements continue to apply in full.
+
+## Appendix J — Why the fixed-target geometry failed, and the redesign
+
+### J.1 The measured problem
+On 21.6 years (127 trades), realized outcomes were: average losing trade **−1.12R**, average winning trade **+1.83R** (a fixed-2R target, minus costs/slippage), win rate **29–35%**. That geometry needs ≈ 38–40% winners to break even; the strategy delivers fewer. The fixed target also **caps the right tail**: gold trends persist well beyond 2R, and the CHoCH early-exit (Part I §8.2) closed 24 trades at an average of only **+0.36R**, cutting winners short. The edge, if any, must come from **letting winners run** and **cutting the reversal-to-full-stop losers**, not from a higher hit rate.
+
+### J.2 Redesign — three configurable exit mechanics
+All are parameters so they can be settled by walk-forward OOS results, never hand-picked in-sample.
+
+1. **Exit mode (`stops_targets.exit_mode`)**
+   - `fixed_rr` (Iteration 1 behavior; default so nothing silently changes): stop beyond the swing extreme (Appendix A.7), take-profit at `min_rr` × risk.
+   - `trail_structure` (new): **no fixed take-profit** (target set to ±∞). The stop is trailed behind confirmed **setup-TF** structure — for a long, up to (most-recent confirmed swing low − `stop_atr_mult`×ATR); for a short, down to (most-recent confirmed swing high + `stop_atr_mult`×ATR). Trailing uses only **confirmed** swings (emitted at `i+R`, repaint-safe) and the current close, so it is fully causal. The stop may only tighten (already enforced by the broker). The position exits when the trailing stop is hit, or (optionally) on a counter-CHoCH, or at end-of-data.
+
+2. **Breakeven rule (`stops_targets.be_trigger_r`, 0 = off)**
+   Once unrealized profit reaches `be_trigger_r` × initial-risk-per-unit, move the stop to the entry price (once). Directly attacks the −1.12R losers: a trade that goes ≥ `be_trigger_r` R in favor and then reverses is scratched near breakeven instead of losing a full R. Applies in both exit modes.
+
+3. **CHoCH-exit toggle (`stops_targets.use_choch_exit`, default true = Part I §8.2)**
+   When `false`, a counter-CHoCH no longer force-closes the position; the trailing stop (or fixed target) does the work. Lets the walk-forward test whether §8.2 was protecting capital or amputating winners (the +0.36R evidence suggests the latter).
+
+### J.3 What is deliberately *not* changed
+Entry location, QM/Fib/PA gating, sizing (MIN of risk/vol/margin), session/news/regime filters, kill-switches, and the one-retest freshness rule are all unchanged. This isolates the exit variable so that any change in OOS performance is attributable to exit geometry alone (a controlled experiment, not a rewrite).
+
+### J.4 Acceptance
+Same bar as Part II Appendix E, judged on **walk-forward OOS only**: profit factor ≥ 1.3, expectancy > 0 after full costs, ≥ 30 OOS trades, sensitivity stable at ±20%. If `trail_structure` + breakeven does not clear this, the *concept* (not the tuning) is unproven on gold and the system does not proceed to Phase 3.
