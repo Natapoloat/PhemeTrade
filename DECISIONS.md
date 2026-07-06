@@ -169,6 +169,21 @@ automation, and the interpretation chosen. Spec references in parentheses.
     2004 trade that "hit target" for −0.19R after gapping past the target at
     entry. A live adapter should implement the same pre-trade sanity check.
 
+29. **Fib veto made configurable (`qm.fib_veto`).** Funnel measurement on the
+    2004–2026 dataset showed the DECISIONS #6 hard discard kills 69% of
+    geometrically valid QMs (4,374 of 6,343). A.4's text also supports Fib as
+    confluence rather than veto. `fib_veto: true` (default) keeps #6 behavior;
+    `false` keeps the pattern with zone = QML band and records
+    `fib_confluence` as a per-trade quality flag. The choice is an
+    OPTIMIZABLE parameter to be settled by walk-forward OOS results, not by
+    in-sample preference.
+
+30. **Trigger set made configurable (`price_action.triggers`).** The 21.6y
+    backtest showed pin-bar entries +0.20R (n=54) vs engulfing −0.42R (n=63)
+    — an exploratory, post-hoc observation. Rather than hand-picking winners
+    in-sample (data snooping), the enabled trigger subset is exposed as a
+    walk-forward grid dimension. Default remains all three (A.5 as written).
+
 21. **ATR formula (Part I §7.2).** The spec's literal text — "ATR = Yesterday's
     ATR + (Expo. Avg Factor × Today's True Range)" — omits the EMA decay term
     and would grow without bound. Implemented as the standard EMA recursion the

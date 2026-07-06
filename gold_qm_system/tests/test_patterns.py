@@ -100,6 +100,36 @@ def test_non_adjacent_left_shoulder_is_found():
     assert pat.neck.price == 102
 
 
+def test_fib_veto_toggle_on_empty_intersection():
+    """Under 85 puts the QML (110) at 83% retrace — outside the Fib window,
+    so the band misses it. fib_veto=True discards; fib_veto=False keeps the
+    pattern with zone = QML band and fib_confluence=False (DECISIONS #29)."""
+    def build(det):
+        det.on_swing(sw("high", 10, 110), 2.0)
+        det.on_swing(sw("low", 15, 100), 2.0)
+        det.on_swing(sw("high", 20, 115), 2.0)
+        return det.on_swing(sw("low", 25, 85), 2.0)
+
+    assert build(QMDetector(QMConfig(fib_veto=True))) is None
+    pat = build(QMDetector(QMConfig(fib_veto=False)))
+    assert pat is not None and pat.fib_confluence is False
+    assert (pat.zone_lo, pat.zone_hi) == (pytest.approx(109.8), pytest.approx(110.2))
+    # a pattern WITH confluence keeps the flag True in soft mode too
+    det = QMDetector(QMConfig(fib_veto=False))
+    pat2 = feed_sell_qm(det)
+    assert pat2.fib_confluence is True
+
+
+def test_trigger_subset_respected():
+    pin = Bar(open=101.5, high=110.0, low=100.0, close=100.8)
+    prev = Bar(open=105.0, high=106.0, low=103.0, close=104.0)
+    engulf = Bar(open=103.5, high=107.0, low=103.0, close=106.5)
+    assert any_trigger([pin], "sell", enabled=["pin_bar"]) == "pin_bar"
+    assert any_trigger([pin], "sell", enabled=["engulfing"]) is None
+    assert any_trigger([prev, engulf], "buy", enabled=["engulfing"]) == "engulfing"
+    assert any_trigger([prev, engulf], "buy", enabled=["pin_bar"]) is None
+
+
 def test_lookback_exceeded_rejects_pattern():
     det = QMDetector(QMConfig(qm_lookback=10))                # pt5-pt2 = 15 > 10
     assert feed_sell_qm(det) is None

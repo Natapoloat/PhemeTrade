@@ -41,6 +41,7 @@ class QMPattern:
     zone_lo: float        # entry zone = fib window ∩ QML band (price low)
     zone_hi: float        # (price high)
     status: QMStatus = "fresh"
+    fib_confluence: bool = True   # False = zone fell back to the QML band (DECISIONS #29)
     in_first_touch: bool = field(default=False, init=False)
     touched: bool = field(default=False, init=False)
 
@@ -162,12 +163,18 @@ class QMDetector:
                                        self.cfg.fib_entry_low, self.cfg.fib_entry_high)
         zone_lo = max(fib_lo_p, qml - qml_tol)
         zone_hi = min(fib_hi_p, qml + qml_tol)
-        if zone_lo > zone_hi:
-            return None                             # empty intersection (DECISIONS #6)
+        fib_confluence = zone_lo <= zone_hi
+        if not fib_confluence:
+            if self.cfg.fib_veto:
+                return None                         # hard discard (DECISIONS #6)
+            # soft mode (DECISIONS #29): keep the pattern; the QML band is the
+            # zone and the missing Fib confluence is recorded as a quality flag
+            zone_lo, zone_hi = qml - qml_tol, qml + qml_tol
 
         pat = QMPattern(direction, pt2, pt3, pt4, pt5, qml, qml_tol,
                         tradeable_index=pt5.confirmed_index,
-                        zone_lo=zone_lo, zone_hi=zone_hi)
+                        zone_lo=zone_lo, zone_hi=zone_hi,
+                        fib_confluence=fib_confluence)
 
         # born-stale retro check: bars strictly after the point-5 bar,
         # up to and including the confirmation bar (DECISIONS #5)

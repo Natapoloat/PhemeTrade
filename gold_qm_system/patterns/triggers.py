@@ -49,15 +49,20 @@ def inside_bar_breakout(mother: Bar, inside: Bar, cur: Bar, direction: Direction
 
 
 def any_trigger(bars: Sequence[Bar], direction: Direction,
-                pin_wick_ratio: float = 0.66) -> str | None:
-    """Evaluate all A.5 triggers on the LAST closed bar of `bars`.
-    Returns the trigger name or None. Needs >= 3 bars for the inside-bar case."""
+                pin_wick_ratio: float = 0.66,
+                enabled: Sequence[str] | None = None) -> str | None:
+    """Evaluate the ENABLED A.5 triggers on the LAST closed bar of `bars`
+    (all three by default; DECISIONS #30). Returns the trigger name or None.
+    Needs >= 3 bars for the inside-bar case."""
+    on = set(enabled) if enabled is not None else {
+        "pin_bar", "engulfing", "inside_bar_breakout"}
     cur = bars[-1]
-    if pin_bar(cur, direction, pin_wick_ratio):
+    if "pin_bar" in on and pin_bar(cur, direction, pin_wick_ratio):
         return "pin_bar"
-    if len(bars) >= 2 and engulfing(bars[-2], cur, direction):
+    if "engulfing" in on and len(bars) >= 2 and engulfing(bars[-2], cur, direction):
         return "engulfing"
-    if len(bars) >= 3 and inside_bar_breakout(bars[-3], bars[-2], cur, direction):
+    if "inside_bar_breakout" in on and len(bars) >= 3 and \
+            inside_bar_breakout(bars[-3], bars[-2], cur, direction):
         return "inside_bar_breakout"
     return None
 

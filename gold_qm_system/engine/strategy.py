@@ -236,7 +236,8 @@ class QMStrategy:
             trigger = "none"
             if self.cfg.layers.use_price_action:
                 trigger = any_trigger(list(self._entry_bars), pat.direction,
-                                      self.cfg.price_action.pin_wick_ratio)
+                                      self.cfg.price_action.pin_wick_ratio,
+                                      enabled=self.cfg.price_action.triggers)
                 if trigger is None:
                     continue
             self._submit(time, close, pat, trigger, sess, rsi_val, atr_pctile)
@@ -274,6 +275,7 @@ class QMStrategy:
             "qm_points": {"ls": pat.ls.index, "neck": pat.neck.index,
                           "head": pat.head.index, "under": pat.under.index},
             "zone": (pat.zone_lo, pat.zone_hi),
+            "fib_confluence": pat.fib_confluence,
             "trigger": trigger,
             "sfp": (self.cfg.layers.use_sfp_booster
                     and sfp(bars[-1], pat.qml, pat.direction,

@@ -42,6 +42,12 @@ class QMConfig(BaseModel):
     qm_lookback: int = Field(120, ge=10, description="max bars for a valid 2->5 sequence")
     qml_atr_mult: float = Field(0.10, ge=0.0, description="qml_tol = qml_atr_mult * ATR")
     break_frac: float = Field(0.0, ge=0.0, description="required fractional break of pt2/pt3")
+    fib_veto: bool = Field(
+        True,
+        description="True: discard patterns whose Fib window misses the QML band "
+                    "(DECISIONS #6); False: keep them, zone = QML band, Fib logged "
+                    "as a confluence flag (DECISIONS #29)",
+    )
     fib_entry_low: float = Field(0.618, gt=0.0, lt=1.0)
     fib_entry_high: float = Field(0.786, gt=0.0, lt=1.0)
 
@@ -55,6 +61,9 @@ class QMConfig(BaseModel):
 class PriceActionConfig(BaseModel):
     """Appendix A.5/A.6 — price-action triggers and SFP booster."""
 
+    triggers: list[Literal["pin_bar", "engulfing", "inside_bar_breakout"]] = Field(
+        default_factory=lambda: ["pin_bar", "engulfing", "inside_bar_breakout"],
+        min_length=1, description="enabled A.5 entry triggers (DECISIONS #30)")
     pin_wick_ratio: float = Field(0.66, gt=0.0, lt=1.0)
     sfp_wick_ratio: float = Field(0.5, gt=0.0, lt=1.0)
     compression_bars: int = Field(4, ge=2, description="min consecutive contracting-range bars for compression")
