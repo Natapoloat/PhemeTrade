@@ -383,3 +383,19 @@ Entry location, QM/Fib/PA gating, sizing (MIN of risk/vol/margin), session/news/
 
 ### J.4 Acceptance
 Same bar as Part II Appendix E, judged on **walk-forward OOS only**: profit factor ≥ 1.3, expectancy > 0 after full costs, ≥ 30 OOS trades, sensitivity stable at ±20%. If `trail_structure` + breakeven does not clear this, the *concept* (not the tuning) is unproven on gold and the system does not proceed to Phase 3.
+
+### J.5 Outcome — hypothesis FALSIFIED (2026-07-07)
+Controlled full-sample comparison on 21.6 years (fixed_rr baseline vs trailing/breakeven variants, entry logic held constant):
+
+| exit config | trades | exp. R | win% | PF | best trade |
+|---|---|---|---|---|---|
+| fixed_rr (Iter 1) | 127 | −0.12 | 35% | 0.84 | +2.0R |
+| trail_structure | 123 | −0.25 | 25% | 0.28 | **+2.9R** |
+| trail + BE@1R | 123 | −0.21 | 24% | 0.30 | +2.9R |
+| fixed + BE@1R | 127 | −0.14 | 31% | 0.78 | +2.0R |
+
+Two findings, both against the redesign:
+1. **No fat right tail exists to harvest.** Letting every winner run with a structural trailing stop produced a best-ever trade of only **+2.9R** — the premise "gold trends persist well beyond 2R *from these entries*" is false. The QM retest does not locate the origin of large trends.
+2. **Trailing destroys the win rate** (35% → 24%): the stop behind the last confirmed setup swing is hit on ordinary pullbacks before any trend develops, converting +2R winners into scratches/losses. Breakeven was neutral-to-slightly-negative.
+
+**Conclusion:** the exit geometry was not the binding constraint; **the entry is.** Fixed 2R was, in fact, the best of the exit variants. Walk-forward was deliberately **not** run on the trailing variants — an in-sample PF of 0.28–0.30 cannot be rescued out-of-sample, so spending the compute would be validation theater. Iteration 2's specific hypothesis is rejected; the exit knobs remain in the codebase (defaulting to `fixed_rr`, i.e. inert) for future use, but the search now belongs at the entry, or the QM-on-gold concept should be retired. See VALIDATION.md.
