@@ -23,6 +23,7 @@ import pandas as pd
 
 from gold_qm_system.config import QMConfig
 from gold_qm_system.indicators import SwingPoint
+from .zones import leg_has_fvg
 
 QMDirection = Literal["sell", "buy"]
 QMStatus = Literal["fresh", "stale", "invalid"]
@@ -42,6 +43,8 @@ class QMPattern:
     zone_hi: float        # (price high)
     status: QMStatus = "fresh"
     fib_confluence: bool = True   # False = zone fell back to the QML band (DECISIONS #29)
+    has_departure_fvg: bool = False   # K.1 #2: impulse leg left an imbalance
+    departure_fvg_size: float = 0.0
     in_first_touch: bool = field(default=False, init=False)
     touched: bool = field(default=False, init=False)
 
@@ -171,10 +174,19 @@ class QMDetector:
             # zone and the missing Fib confluence is recorded as a quality flag
             zone_lo, zone_hi = qml - qml_tol, qml + qml_tol
 
+        # zone quality (Appendix K.1 #2): does the confirming impulse leg
+        # pt4->pt5 contain a same-direction FVG (imbalance)? Uses closed-bar
+        # high/low already stored in _recent -> causal.
+        has_fvg, fvg_size = self._leg_fvg(direction, pt4.index, pt5.index,
+                                          self.cfg.min_departure_fvg_atr * atr_val)
+        if self.cfg.require_departure_fvg and not has_fvg:
+            return None                             # weak zone -> discard (K.1 #2)
+
         pat = QMPattern(direction, pt2, pt3, pt4, pt5, qml, qml_tol,
                         tradeable_index=pt5.confirmed_index,
                         zone_lo=zone_lo, zone_hi=zone_hi,
-                        fib_confluence=fib_confluence)
+                        fib_confluence=fib_confluence,
+                        has_departure_fvg=has_fvg, departure_fvg_size=fvg_size)
 
         # born-stale retro check: bars strictly after the point-5 bar,
         # up to and including the confirmation bar (DECISIONS #5)
@@ -188,6 +200,18 @@ class QMDetector:
         if len(self._patterns) > self._max_patterns:
             self._patterns = self._patterns[-self._max_patterns:]
         return pat
+
+    def _leg_fvg(self, direction: QMDirection, i0: int, i1: int,
+                 min_size: float) -> tuple[bool, float]:
+        """FVG in the impulse leg [i0, i1], reading closed-bar high/low from
+        _recent. Same-direction gap: buy=bullish, sell=bearish."""
+        leg = [(bi, bh, bl) for (bi, bh, bl) in self._recent if i0 <= bi <= i1]
+        if len(leg) < 3:
+            return False, 0.0
+        leg.sort(key=lambda x: x[0])
+        highs = [h for (_, h, _) in leg]
+        lows = [lo for (_, _, lo) in leg]
+        return leg_has_fvg(highs, lows, direction, min_size)
 
     # ------------------------------------------------------------- bar close
     def on_bar_close(self, bar_index: int, high: float, low: float, close: float) -> None:

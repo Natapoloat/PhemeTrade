@@ -35,6 +35,54 @@ def feed_sell_qm(det, atr=2.0):
     return det.on_swing(sw("low", 25, 95), atr)
 
 
+def _sell_qm_with_bars(det, leg_has_gap: bool, atr=2.0):
+    """Build the standard SELL QM, feeding bars so the head->under leg [20,25]
+    either contains a bearish FVG (leg_has_gap) or is fully overlapping (not)."""
+    if leg_has_gap:                       # bearish gap at mid 22: low[21] > high[23]
+        leg = {20: (115, 112), 21: (113, 110), 22: (109, 106),
+               23: (105, 102), 24: (101, 98), 25: (97, 95)}
+    else:                                 # overlapping drop, no gap
+        leg = {20: (115, 110), 21: (113, 108), 22: (111, 106),
+               23: (112, 107), 24: (110, 105), 25: (108, 95)}
+    for i in range(29):
+        h, l = leg.get(i, (97.0, 95.0))   # non-leg bars sit far below the QML band
+        det.on_bar_close(i, float(h), float(l), float((h + l) / 2))
+    det.on_swing(sw("high", 10, 110), atr)
+    det.on_swing(sw("low", 15, 100), atr)
+    det.on_swing(sw("high", 20, 115), atr)
+    return det.on_swing(sw("low", 25, 95), atr)
+
+
+def test_departure_fvg_detected_and_flagged():
+    det = QMDetector(QMConfig())          # filter off: pattern forms, flag set
+    pat = _sell_qm_with_bars(det, leg_has_gap=True)
+    assert pat is not None and pat.has_departure_fvg
+    assert pat.departure_fvg_size == pytest.approx(5.0)   # gap [105,110]
+
+
+def test_departure_fvg_filter_discards_weak_zone():
+    # require FVG: strong leg passes, overlapping (weak) leg is discarded (K.1 #2)
+    strong = _sell_qm_with_bars(QMDetector(QMConfig(require_departure_fvg=True)), True)
+    assert strong is not None and strong.has_departure_fvg
+    weak = _sell_qm_with_bars(QMDetector(QMConfig(require_departure_fvg=True)), False)
+    assert weak is None
+    # without the filter, the weak setup still forms (flag False)
+    weak_nofilter = _sell_qm_with_bars(QMDetector(QMConfig()), False)
+    assert weak_nofilter is not None and not weak_nofilter.has_departure_fvg
+
+
+def test_departure_fvg_min_size_threshold():
+    # gap is 5.0; require min 6*ATR? no -> use atr=2 & min_departure_fvg_atr=3 -> 6.0 > 5 -> discard
+    big_req = _sell_qm_with_bars(
+        QMDetector(QMConfig(require_departure_fvg=True, min_departure_fvg_atr=3.0)),
+        leg_has_gap=True, atr=2.0)
+    assert big_req is None                # 5.0 < 6.0 threshold
+    ok_req = _sell_qm_with_bars(
+        QMDetector(QMConfig(require_departure_fvg=True, min_departure_fvg_atr=2.0)),
+        leg_has_gap=True, atr=2.0)
+    assert ok_req is not None             # 5.0 >= 4.0
+
+
 # ------------------------------------------------------------------ QM: valid
 
 def test_valid_sell_qm_forms_with_correct_geometry():

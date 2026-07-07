@@ -315,6 +315,8 @@ class QMStrategy:
                           "head": pat.head.index, "under": pat.under.index},
             "zone": (pat.zone_lo, pat.zone_hi),
             "fib_confluence": pat.fib_confluence,
+            "has_departure_fvg": pat.has_departure_fvg,
+            "departure_fvg_size": pat.departure_fvg_size,
             "trigger": trigger,
             "sfp": (self.cfg.layers.use_sfp_booster
                     and sfp(bars[-1], pat.qml, pat.direction,

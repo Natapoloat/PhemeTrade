@@ -50,6 +50,12 @@ class QMConfig(BaseModel):
     )
     fib_entry_low: float = Field(0.618, gt=0.0, lt=1.0)
     fib_entry_high: float = Field(0.786, gt=0.0, lt=1.0)
+    # Appendix K.1 #2 — zone-quality: require an imbalance (FVG) in the
+    # confirming impulse leg (head->under); discards weak overlapping setups.
+    require_departure_fvg: bool = Field(
+        False, description="K.1 #2: require a same-direction FVG in the pt4->pt5 impulse leg")
+    min_departure_fvg_atr: float = Field(
+        0.0, ge=0.0, description="minimum FVG size as a multiple of ATR (0 = any gap counts)")
 
     @model_validator(mode="after")
     def _fib_order(self) -> "QMConfig":
