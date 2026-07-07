@@ -399,3 +399,43 @@ Two findings, both against the redesign:
 2. **Trailing destroys the win rate** (35% → 24%): the stop behind the last confirmed setup swing is hit on ordinary pullbacks before any trend develops, converting +2R winners into scratches/losses. Breakeven was neutral-to-slightly-negative.
 
 **Conclusion:** the exit geometry was not the binding constraint; **the entry is.** Fixed 2R was, in fact, the best of the exit variants. Walk-forward was deliberately **not** run on the trailing variants — an in-sample PF of 0.28–0.30 cannot be rescued out-of-sample, so spending the compute would be validation theater. Iteration 2's specific hypothesis is rejected; the exit knobs remain in the codebase (defaulting to `fixed_rr`, i.e. inert) for future use, but the search now belongs at the entry, or the QM-on-gold concept should be retired. See VALIDATION.md.
+
+---
+
+# PART IV — KNOWLEDGE EXTRACTED FROM THE MIXER CRYPTO COURSE (Appendix K)
+> Source: two Thai course decks — "The Ultimate Crypto Trading V.2" (78pp, Days 1–6) and "Crypto Trading For Beginner V.2" (62pp). Read 2026-07-07. The Beginner deck is foundational (candles, Engulfing/Pinbar, trend, the same Basso-style money-management) and adds nothing beyond what we implement. The Ultimate deck teaches the SAME Quasimodo core we built, but wraps it in confluence layers we do NOT have. Those layers are the value.
+
+## K.1 What the course does that we don't
+Our Iteration-1 QM enters at a **bare** `QML ± 0.10·ATR` band ∩ Fib window, gated by a price-action trigger. The course's high-probability QM is materially stricter:
+
+1. **QML + ZONE confluence (the big one).** The entry is not a bare level — it is a QML that **coincides with a fresh Supply/Demand zone**. The zone is the last consolidation *base* before the impulsive leg (RBR/DBR = demand; DBD/RBD = supply). Entry is at the zone sitting on the QML, not at the line itself.
+
+2. **Zone quality = departure-impulse strength (Imbalance / FVG), scored 2/1/0.**
+   - **Strongest (2):** price leaves the base as a single strong candle / clean **Imbalance** (Fair Value Gap).
+   - **Strong (1):** a couple of decent candles, some imbalance.
+   - **Weak (0):** overlapping, messy exit, no imbalance → **do not trade**.
+   The codeable core: a valid zone requires a **strong impulsive departure that leaves an FVG**. (Bullish FVG = a 3-candle gap where `high[i-1] < low[i+1]`; bearish mirror.)
+
+3. **Graded freshness (touch count), scored 2/1/0.** 0 prior touches = Strongest; 1 touch = Strong; 2+ = Weak. (We do binary fresh→stale; the course grades it and would still trade a 1-touch zone at reduced conviction.)
+
+4. **R:R-to-structure as an ENTRY FILTER (not just a target).** Measure R:R from entry to the **next opposing structure** (SELL → the prior LL; BUY → the prior HH). Take the trade only if the room gives **R:R ≥ 2 (ideally ≥ 3)**; skip zones with < 2R of room. Grade 2/1/0 by R:R ≥3 / =2 / =1.
+
+5. **Zone-relative SL.** SL = **zone far edge + 0.5–1%** (percentage buffer beyond the base), not an ATR multiple.
+
+6. **Optional momentum confluence (RSI divergence), graded, NOT mandatory.** Classic Divergence (Level 1 = high reversal odds, 2 = medium, 3 = consolidation) and Hidden Divergence at the zone are conviction **boosters** — the course explicitly tags them "อาจไม่เกิด" (may not occur). Matches how we treat SFP/CPLQ.
+
+7. **Quick vs Late Retest.** *Quick* = immediate return to QML (our current case). *Late* = price consolidates first and typically forms a **wedge / Price Pattern** before the reversal; for late retests, require that compression/wedge as confirmation.
+
+8. **Channel context (Major/Minor).** Draw the trend channel; QM-reversal setups are highest-value at channel extremes. (Lower priority; harder to make unambiguous.)
+
+## K.2 Prioritized, codeable changes (Iteration 3 candidates)
+Ranked by expected impact on the diagnosed root cause ("the ENTRY does not locate good reversals", Appendix J.5):
+
+- **[P1] Zone-at-QML + FVG departure filter** (K.1 #1, #2). New `patterns/zones.py`: detect RBR/DBR/DBD/RBD bases, require a departure FVG, keep only zones overlapping the fresh QML band. This is the single most promising lever and is directly testable.
+- **[P1] R:R-to-structure entry filter** (K.1 #4): skip QM setups whose distance to the next opposing structure is < `min_rr`. One function; high leverage; cheap.
+- **[P2] Zone-relative SL option** (K.1 #5) and **graded freshness** (K.1 #3): config toggles.
+- **[P3] RSI-divergence booster** (K.1 #6) and **late-retest wedge requirement** (K.1 #7): optional gates/size-scalers.
+- **[P4] Channel context** (K.1 #8): defer; ambiguous to automate well.
+
+## K.3 Discipline
+This is genuinely NEW information (zone+imbalance confluence), not a re-tune of failed knobs — so it is a legitimate Iteration 3, not data-snooping. But the same bar applies: build → unit-test (no-lookahead: FVG uses only closed bars; zones from confirmed structure) → **walk-forward OOS on the 21.6-year gold set + the universe scan**, reporting OOS only. Acceptance unchanged (Appendix E). It may still fail; if the QML+zone+FVG+R:R version also shows no OOS edge, the QM concept on these markets is retired with high confidence.
