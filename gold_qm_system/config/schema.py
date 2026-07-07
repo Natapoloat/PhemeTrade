@@ -92,6 +92,10 @@ class StopsTargetsConfig(BaseModel):
     use_choch_exit: bool = Field(
         True, description="J.2: counter-CHoCH force-closes the position (Part I 8.2); "
                           "False lets the trail/target run")
+    min_rr_to_structure: float = Field(
+        0.0, ge=0.0,
+        description="K.1 #4: skip a QM entry if room to the opposite structure "
+                    "(pattern UNDER/OVER) gives < this many R (0 = filter off)")
 
 
 class IndicatorConfig(BaseModel):

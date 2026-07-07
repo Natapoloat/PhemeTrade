@@ -277,7 +277,8 @@ class QMStrategy:
                                       enabled=self.cfg.price_action.triggers)
                 if trigger is None:
                     continue
-            self._submit(time, close, pat, trigger, sess, rsi_val, atr_pctile)
+            if not self._submit(time, close, pat, trigger, sess, rsi_val, atr_pctile):
+                continue                                       # R:R gate failed -> keep level fresh
             pat.status = "stale"                               # the retest is being traded
             return                                             # one entry per bar
 
@@ -300,12 +301,27 @@ class QMStrategy:
 
     def _submit(self, time: pd.Timestamp, close: float, pat: QMPattern,
                 trigger: Optional[str], sess: str, rsi_val: Optional[float],
-                atr_pctile: Optional[float]) -> None:
+                atr_pctile: Optional[float]) -> bool:
+        """Returns True if the level was consumed (order attempted), False if a
+        quality gate rejected it (level stays fresh)."""
         atr_setup = self.setup.atr.value or 0.0
         stop, target = build_stop_and_target(
             pat.direction, close, pat.stop_extreme, atr_setup,
             self.cfg.stops_targets.stop_atr_mult, self.cfg.stops_targets.min_rr,
             self.cfg.stops_targets.exit_mode)
+
+        # R:R-to-structure entry filter (Appendix K.1 #4): require enough room to
+        # the opposite structure (the pattern's UNDER for sells / OVER for buys).
+        min_rr_struct = self.cfg.stops_targets.min_rr_to_structure
+        if min_rr_struct > 0:
+            risk = abs(close - stop)
+            room = (close - pat.under.price) if pat.direction == "sell" \
+                else (pat.under.price - close)
+            rr_struct = (room / risk) if risk > 0 else 0.0
+            if rr_struct < min_rr_struct:
+                self._skip(time, "rr_to_structure")
+                return False
+
         bars = list(self._entry_bars)
         meta = {
             "setup": "qm",
@@ -335,6 +351,7 @@ class QMStrategy:
             "tf_entry": self.cfg.timeframes.entry,
         }
         self._submit_order(time, close, pat.direction, stop, target, meta)
+        return True
 
     def _submit_order(self, time, close, direction, stop, target, meta) -> None:
         equity = self.broker.equity()

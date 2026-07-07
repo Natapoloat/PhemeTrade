@@ -125,6 +125,19 @@ def test_end_to_end_sell_qm_trade():
     assert res.equity_curve.iloc[-1] > res.equity_curve.iloc[0]
 
 
+def test_rr_to_structure_filter(monkeypatch):
+    """Appendix K.1 #4: the fixture's room to the UNDER (95) is smaller than the
+    stop distance (structural R:R < 1), so a threshold of 2 filters the trade;
+    threshold 0 (default) trades it."""
+    base = qm_config().model_dump()
+    base["stops_targets"]["min_rr_to_structure"] = 2.0
+    filtered = run_backtest(SystemConfig.model_validate(base), qm_frame())
+    assert filtered.trades == []
+    assert any(e["reason"] == "rr_to_structure" for e in filtered.skip_log)
+    # default off -> trades as before
+    assert len(run_backtest(qm_config(), qm_frame()).trades) == 1
+
+
 def test_no_trade_without_price_action_when_no_trigger():
     """Remove the pin bar (b10 becomes a bland zone-touch): with the PA layer
     ON there is no trigger -> no trade; with PA OFF the armed touch trades."""
