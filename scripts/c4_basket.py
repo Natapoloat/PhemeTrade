@@ -10,6 +10,7 @@ Usage:  python scripts/c4_basket.py
 """
 from __future__ import annotations
 
+import argparse
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -30,16 +31,18 @@ BASKET = ["XAUUSDm", "XAGUSDm", "EURUSDm", "GBPUSDm", "USDJPYm", "AUDUSDm",
           "BTCUSDm", "US30m", "USTECm", "USOILm"]
 IN_SAMPLE = {"XAUUSDm"}
 L, BAND = 55, (0.0, 1.0)   # frozen from gold
+TF_MAP = {"H1": (mt5.TIMEFRAME_H1, 400), "D1": (mt5.TIMEFRAME_D1, 1500)}
 
 
-def fetch_h1(symbol: str) -> pd.DataFrame | None:
+def fetch(symbol: str, tf_label: str) -> pd.DataFrame | None:
+    tf_const, step = TF_MAP[tf_label]
     mt5.symbol_select(symbol, True)
     end = datetime.now(timezone.utc)
     cur = end - timedelta(days=365.25 * 15)
     frames = []
     while cur < end:
-        hi = min(cur + timedelta(days=400), end)
-        r = mt5.copy_rates_range(symbol, mt5.TIMEFRAME_H1, cur, hi)
+        hi = min(cur + timedelta(days=step), end)
+        r = mt5.copy_rates_range(symbol, tf_const, cur, hi)
         if r is not None and len(r):
             frames.append(pd.DataFrame(r))
         cur = hi
@@ -51,10 +54,11 @@ def fetch_h1(symbol: str) -> pd.DataFrame | None:
         "open": raw["open"], "high": raw["high"], "low": raw["low"],
         "close": raw["close"], "volume": raw["tick_volume"],
     }).iloc[:-1]
-    return normalize_ohlcv(df, "H1")
+    return normalize_ohlcv(df, tf_label)
 
 
-def symbol_config(base: SystemConfig, symbol: str, zero_cost: bool) -> SystemConfig:
+def symbol_config(base: SystemConfig, symbol: str, zero_cost: bool,
+                  tf_label: str) -> SystemConfig:
     info = mt5.symbol_info(symbol)
     point = info.point
     spread_px = max(info.spread, 1) * point
@@ -62,7 +66,9 @@ def symbol_config(base: SystemConfig, symbol: str, zero_cost: bool) -> SystemCon
     swap_short = info.swap_short * point if info.swap_mode == 0 else 0.0
     d = base.model_dump()
     d["symbol"] = symbol
-    d["timeframes"]["entry"] = "H1"
+    # C4 uses only entry bars (its own ATR/Donchian) — collapse all TFs to the run TF
+    # so the entry<=setup<=directional constraint holds for D1 too.
+    d["timeframes"].update({"entry": tf_label, "setup": tf_label, "directional": tf_label})
     d["sizing"].update({"min_size": 0.0, "size_step": 0.0, "margin_per_unit": 0.0})
     d["news"]["calendar_csv"] = None
     if zero_cost:
@@ -94,10 +100,17 @@ def pooled(rs: np.ndarray) -> dict:
 
 
 def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--tf", default="H1", choices=list(TF_MAP))
+    args = ap.parse_args()
+    tf = args.tf
+    min_bars = 400 if tf == "D1" else 3000
+    candidate = f"C4-basket-{tf.lower()}"
+
     if not mt5.initialize(path=TERMINAL):
         raise SystemExit(f"MT5 init failed: {mt5.last_error()}")
     base = SystemConfig.from_yaml("forwardtest_iter3_config.yaml")
-    log_run("C4-basket", {"L": L, "band": list(BAND), "tf": "H1", "symbols": BASKET,
+    log_run(candidate, {"L": L, "band": list(BAND), "tf": tf, "symbols": BASKET,
             "frozen_from": "gold"}, "pre-registration", {},
             note="Frozen BEFORE first backtest; OOS-by-symbol for 15 non-gold")
 
@@ -105,13 +118,13 @@ def main() -> None:
     for sym in BASKET:
         if mt5.symbol_info(sym) is None:
             print(f"  {sym:<9} SKIP", flush=True); continue
-        bars = fetch_h1(sym)
-        if bars is None or len(bars) < 3000:
+        bars = fetch(sym, tf)
+        if bars is None or len(bars) < min_bars:
             print(f"  {sym:<9} SKIP (insufficient)", flush=True); continue
         bars = development_only(bars)
         out = {}
         for zero, tag in [(False, "net"), (True, "gross")]:
-            res = run_backtest(symbol_config(base, sym, zero), bars,
+            res = run_backtest(symbol_config(base, sym, zero, tf), bars,
                                strategy_factory=make_c4_factory(L, BAND[0], BAND[1]))
             st = compute_stats(res.trades, res.equity_curve, res.slippage_log, 100000)
             out[tag] = (st["trades"], st.get("expectancy_r") or 0.0, st.get("profit_factor") or 0.0)
@@ -129,8 +142,9 @@ def main() -> None:
     mt5.shutdown()
 
     df = pd.DataFrame(rows)
-    Path("output/c4_basket").mkdir(parents=True, exist_ok=True)
-    df.to_csv("output/c4_basket/per_symbol.csv", index=False)
+    outdir = Path(f"output/{candidate}")
+    outdir.mkdir(parents=True, exist_ok=True)
+    df.to_csv(outdir / "per_symbol.csv", index=False)
 
     oos = [s for s in trades_net if s not in IN_SAMPLE]
     allr = pd.concat([trades_net[s] for s in oos if len(trades_net[s])], ignore_index=True)
@@ -151,7 +165,7 @@ def main() -> None:
         corr = float(np.nanmean(cm[np.triu_indices_from(cm, k=1)]))
     n_eff = ps.get("n", 0) / (1 + (len(oos) - 1) * max(corr, 0)) if ps.get("n", 0) else 0
 
-    log_run("C4-basket", {"L": L, "band": list(BAND), "tf": "H1"}, "development-oos-pooled",
+    log_run(candidate, {"L": L, "band": list(BAND), "tf": tf}, "development-oos-pooled",
             {"trades": ps.get("n", 0), "expectancy_r": ps.get("expR"), "profit_factor": ps.get("PF"),
              "t": ps.get("t"), "max_share": max_share, "corr": corr}, note="15 non-gold OOS-by-symbol")
 

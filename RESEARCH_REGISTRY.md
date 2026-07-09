@@ -177,6 +177,43 @@ the file carries only the delayed Sep-2025 CPI on Oct-24 + the scheduled Oct FOM
 no imputed first-Friday event); code must not impute them. Dev window (2018→2024-01,
 scheduled) = 192 events → ~32/yr on gold alone, so C3 power is thin single-symbol.
 
+- **C4-D1 — pooled KILLED, but a different animal (2026-07-10).** Frozen C4 on D1,
+  16-symbol basket, 15 non-gold OOS. Pooled OOS **N=531, net −0.054R, PF 0.846,
+  t=−1.45** → kill line hit (equal-weight universe), so the pre-registered test is
+  closed and the technical search is CLOSED per the plan. BUT two honest differences
+  from the H1 death: (1) **NOT powered** (t=−1.45, ~35 trades/symbol) — this is
+  "not distinguishable from zero", not H1's decisive t=−6.69; (2) **cost wall is
+  GONE** — on D1 gross≈net (drag ~0.01–0.06R), exactly as **G8 predicted** (nice
+  confirmation the gate is real). The pooled negative is driven by an **asset-class
+  split**: trend-follow is positive on the trending classes — USOIL +0.357/PF2.18,
+  BTC +0.234/PF1.68, gold +0.225/PF1.88(IS), GBPJPY +0.104/PF1.31 (several clear the
+  1.3 bar) — and negative on the range-bound FX majors (EURUSD −0.256, AUDUSD −0.199,
+  USDCAD −0.209, EURGBP −0.226). **DISCIPLINE: do NOT declare "trend works on crypto/
+  commodities."** Per-symbol N~27–42 is far too low; the winners may be the same
+  small-sample tail that has burned this project repeatedly, and post-hoc asset-class
+  selection is textbook snooping. It is a POINTER only: a trend-follow restricted to
+  trending classes on D1+ is a legitimately NEW hypothesis needing its own
+  pre-registration AND a D1 data extension for real N — not a rescue of C4-D1.
+
+## G8 — cost-ceiling gate (paper, mandatory before any implementation)
+Derived from the powered negative result (see `TECHNICAL_SEARCH_CONCLUSION.md`).
+For the candidate's TF/symbol/stop: `cost_drag_R ≈ cost_per_ATR / s` (cost_per_ATR
+from `output/scope_metrics.csv`: gold M15 0.29, H1 0.15, D1 ~0.03, news ×~2;
+s = stop in ATR). PASS only if the mechanism can credibly deliver, ON PAPER:
+`gross_expR ≥ 3 × cost_drag_R` AND implied `gross PF ≥ 1.5` (equivalently: expected
+gross favorable excursion ≥ 3 × round-trip cost). Empirically nothing on this universe
+at M15/H1 exceeded gross PF 1.21 / +0.076R, so any intraday-technical retail-spot idea
+FAILS G8 on paper — don't build it. The only ways to pass: lower-cost regime (D1+, or
+futures venue) or a materially larger gross edge (real structural counterparty).
+
+## C4-D1 — pre-registration (closing experiment, 2026-07-10)
+Passes G8 by construction (D1 cost_drag_R ~0.01R vs C4 gross +0.076R). **Frozen params
+identical to C4-basket** (L=55, no vol gate, chandelier 3×ATR, ATR 21) — TF = **D1**,
+same 16-symbol set, per-symbol cost calibration only, gold = IS ref / 15 non-gold =
+OOS-by-symbol, development slice only, holdout sealed. **Kill line:** pooled OOS net
+expR ≤ 0 OR net PF < 1.2 → the technical search is FULLY closed. Report NET+GROSS
+pooled, per-symbol, correlation, effective-N, acceptance. **Status: registered.**
+
 ## Rules (carried from the QM post-mortem)
 - No rescue filters on a failing in-sample result.
 - One config basket-wide (or pre-registered groups metals vs majors); no per-symbol tuning.
