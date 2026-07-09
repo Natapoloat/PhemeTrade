@@ -12,12 +12,20 @@ hypothesis registry. Import this from every new-strategy experiment.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
 
 import pandas as pd
+
+
+def file_sha256(path: str | Path) -> str:
+    """Short SHA-256 of a data file, for pinning a run to the exact inputs used
+    (e.g. the calendar CSV behind a C3 result)."""
+    h = hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    return h[:16]
 
 _ROOT = Path(__file__).resolve().parent.parent
 _RESEARCH = _ROOT / "research"

@@ -89,7 +89,7 @@ costs:
   flat_by_friday: false
 news:
   news_blackout_min: 30
-  calendar_csv: null
+  calendar_csv: doc/us_high_impact_calendar_2018_2026.csv
   min_impact: high
 kill_switches:
   daily_loss_r: 2.0
