@@ -82,6 +82,12 @@ def symbol_config(base: SystemConfig, symbol: str) -> SystemConfig:
     })
     d["sizing"].update({"min_size": 0.0, "size_step": 0.0, "margin_per_unit": 0.0})
     d["news"]["calendar_csv"] = None
+    # spread_cap is an ABSOLUTE-price kill switch (gold-tuned 1.5); without scaling
+    # it vetoes every entry on high-nominal-spread instruments (BTC spread_px~10,
+    # indices ~3) → 0 trades. Scale it to the symbol's own spread (preserve gold's
+    # ~6x headroom); max() so it only ever RAISES the cap → never newly-vetoes a
+    # symbol that already traded (FX/metals results unchanged).
+    d["kill_switches"]["spread_cap"] = max(d["kill_switches"]["spread_cap"], 6.0 * spread_px)
     return SystemConfig.model_validate(d)
 
 
@@ -111,7 +117,10 @@ def main() -> None:
     ap.add_argument("--years", type=float, default=25.0, help="fetch depth; MT5 caps M15 at what it has")
     ap.add_argument("--out", default="output/e1_portfolio")
     ap.add_argument("--config", default="forwardtest_iter3_config.yaml")
+    ap.add_argument("--symbols", default="", help="comma-separated symbol list; overrides the default basket")
     args = ap.parse_args()
+
+    basket = [s.strip() for s in args.symbols.split(",") if s.strip()] or BASKET
 
     outdir = Path(args.out)
     outdir.mkdir(parents=True, exist_ok=True)
@@ -123,7 +132,7 @@ def main() -> None:
         "config is not the frozen Iter3 gold config (FVG>=0.5)"
 
     rows, per_symbol_trades = [], {}
-    for sym in BASKET:
+    for sym in basket:
         if mt5.symbol_info(sym) is None:
             print(f"  {sym:<10} SKIP (not offered)", flush=True)
             continue

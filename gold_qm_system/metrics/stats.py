@@ -11,7 +11,7 @@ import pandas as pd
 from gold_qm_system.execution import TradeRecord
 
 # exits that represent a completed trade thesis (trims are risk management)
-_FULL_EXITS = {"stop", "target", "choch_exit", "flat_friday", "kill_switch", "end_of_data"}
+_FULL_EXITS = {"stop", "target", "choch_exit", "flat_friday", "kill_switch", "end_of_data", "time_exit"}
 
 
 def _annualization_factor(equity: pd.Series) -> float:

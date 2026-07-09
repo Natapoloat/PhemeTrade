@@ -15,7 +15,7 @@ import pandas as pd
 
 Direction = Literal["buy", "sell"]
 ExitReason = Literal["stop", "target", "choch_exit", "trim", "flat_friday",
-                     "kill_switch", "end_of_data", "manual"]
+                     "kill_switch", "end_of_data", "manual", "time_exit"]
 
 
 @dataclass

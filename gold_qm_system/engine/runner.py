@@ -45,12 +45,18 @@ def _run_core(cfg: SystemConfig,
               bars: Iterable[tuple[pd.Timestamp, float, float, float, float]],
               broker: SimBroker,
               calendar: Optional[NewsCalendar] = None,
-              on_event: Optional[Any] = None) -> RunResult:
+              on_event: Optional[Any] = None,
+              strategy_factory: Optional[Any] = None) -> RunResult:
     """The one and only event loop. `bars` yields CLOSED entry-TF bars as
-    (open_time_utc, open, high, low, close), strictly ascending."""
+    (open_time_utc, open, high, low, close), strictly ascending.
+
+    `strategy_factory(cfg, broker, ks, calendar) -> strategy` selects the signal
+    logic; defaults to QMStrategy so existing callers are unchanged. A new
+    strategy class only needs on_bar_close(...), .skip_log and .halted."""
     calendar = calendar if calendar is not None else _make_calendar(cfg)
     ks = KillSwitchMonitor(cfg.kill_switches, cfg.account.initial_equity)
-    strategy = QMStrategy(cfg, broker, ks, calendar)
+    factory = strategy_factory if strategy_factory is not None else QMStrategy
+    strategy = factory(cfg, broker, ks, calendar)
     entry_delta = timeframe_delta(cfg.timeframes.entry)
 
     eq_times: list[pd.Timestamp] = []
@@ -90,7 +96,8 @@ def _run_core(cfg: SystemConfig,
 
 
 def run_backtest(cfg: SystemConfig, entry_bars: pd.DataFrame,
-                 calendar: Optional[NewsCalendar] = None) -> RunResult:
+                 calendar: Optional[NewsCalendar] = None,
+                 strategy_factory: Optional[Any] = None) -> RunResult:
     """Backtest over a normalized entry-TF OHLC DataFrame (see data.loaders)."""
     broker = SimBroker(cfg.account.initial_equity, cfg.costs)
 
@@ -99,7 +106,7 @@ def run_backtest(cfg: SystemConfig, entry_bars: pd.DataFrame,
                           entry_bars[["open", "high", "low", "close"]].itertuples(index=False)):
             yield t, row.open, row.high, row.low, row.close
 
-    result = _run_core(cfg, gen(), broker, calendar)
+    result = _run_core(cfg, gen(), broker, calendar, strategy_factory=strategy_factory)
     _settle_end_of_data(cfg, broker, entry_bars, result)
     return result
 

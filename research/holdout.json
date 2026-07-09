@@ -1,0 +1,7 @@
+{
+  "cutoff_utc": "2024-01-09T00:00:00+00:00",
+  "holdout_years": 2.5,
+  "frozen_at": "2026-07-09T03:48:24.894132+00:00",
+  "rule": "data >= cutoff_utc is sealed; evaluate ONCE, last, per strategy class",
+  "note": "Next-strategy scoping brief G7.1; most-recent 2.5y sealed across all symbols, one shot per strategy class"
+}
