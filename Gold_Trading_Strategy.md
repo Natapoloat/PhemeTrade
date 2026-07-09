@@ -83,15 +83,17 @@ QM is a reversal pattern (cousin of Head & Shoulders) distinguished by **asymmet
 
 ### 4.2 Entry Technique
 1. Identify Over (HH in downtrend context / — mirror for uptrend) and Under (LL) → confirms QM validity.
-2. Wait for price to **retrace back toward the QML/MPL confluence zone**.
-3. Use **Fibonacci retracement**, always drawn **left-to-right** (top of the relevant swing = 100, bottom = 0, or mirrored for sell setups).
-4. **Entry zone = 61.8%–78.6% Fibonacci retracement**, ideally overlapping the QML/MPL level.
-5. Only trade a QML that is still **"fresh"** (i.e., price has not already retested it once — a second retest is a materially lower-probability, higher-risk trade).
+2. **🆕 Departure-FVG / imbalance check (Iteration 3, now live).** The Head→Under leg (the impulsive move *out* of the zone) must leave a same-direction **Fair Value Gap ≥ 0.5 × ATR**. No gap ⇒ the departure was too weak ⇒ the zone is low-quality ⇒ **discard this QM, do not trade it.** See Appendix K.1 #2 and Part V. Config: `qm.require_departure_fvg=true`, `qm.min_departure_fvg_atr=0.5`.
+3. Wait for price to **retrace back toward the QML/MPL confluence zone**.
+4. Use **Fibonacci retracement**, always drawn **left-to-right** (top of the relevant swing = 100, bottom = 0, or mirrored for sell setups).
+5. **Entry zone = 61.8%–78.6% Fibonacci retracement**, ideally overlapping the QML/MPL level.
+6. Only trade a QML that is still **"fresh"** (i.e., price has not already retested it once — a second retest is a materially lower-probability, higher-risk trade).
 
 ### 4.3 Stop Loss / Take Profit
-- **Stop Loss:**
-  - Sell: above the swing High (the "Over" / Head).
-  - Buy: below the swing Low (the "Under").
+- **Stop Loss (at the swing extreme — confirmed best, Iteration 4):**
+  - Sell: above the swing High (the "Over" / Head), + `0.25 × ATR` buffer.
+  - Buy: below the swing Low (the "Under"), + `0.25 × ATR` buffer.
+  - ⚠️ **Iteration-4 lesson:** moving the stop *in* to the QML band edge (tighter, hoping for better R:R) was tested and made results **clearly worse** (win rate 45%→35%) — the tight stop gets noise-picked before price reaches target. **Keep the wider swing-extreme stop; the trade needs room to breathe.** See Part V.
 - **Take Profit — three methods (use most conservative / most appropriate for context):**
   1. Target the origin of the opposite move — i.e., price returning to the next QML zone in the counter-direction.
   2. **Fixed Risk:Reward** — 1:2, 1:3, or 1:5 depending on conviction and structure quality.
@@ -130,13 +132,14 @@ Run through in order. All must be satisfied before entry:
 
 1. **[ ] Directional bias set** on Daily/H4 via Market Structure (Layer 1) — trading with the higher-TF trend unless explicit MSS reversal confirmed.
 2. **[ ] QM pattern identified** on the setup TF (H1/M15): Over + Under confirmed, QML/MPL marked, level still fresh.
-3. **[ ] Liquidity context confirmed:** Is the Over/Under a genuine stop-hunt into buy-side/sell-side liquidity? Any fakeout/SFP visible around the level?
-4. **[ ] Price returns to the 61.8%–78.6% Fib zone**, ideally overlapping QML/MPL confluence.
-5. **[ ] Price action confirmation** on entry TF (M5/M1): Pin Bar, Engulfing, or a completed Compression/Inside-Bar breakout in the expected direction.
-6. **[ ] Stop loss defined** beyond the swing extreme (Over for sells, Under for buys) — never at the obvious round number itself; add a small buffer past the wick.
-7. **[ ] Take profit defined** using one of the three TP methods (Layer 4.3), matched to a minimum 1:2 R:R.
-8. **[ ] Position size calculated** per Section 7 before order is placed — never size intuitively.
-9. **[ ] Macro/news filter checked** — no major USD/gold-moving release (FOMC, NFP, CPI) within the next candle or two unless the setup explicitly trades the news-spike-fade pattern (Layer 2.2 #3).
+3. **[ ] 🆕 Head→Under leg leaves a same-direction FVG ≥ 0.5 × ATR** — if no imbalance, discard this setup immediately (Iteration-3 zone-quality gate).
+4. **[ ] Liquidity context confirmed:** Is the Over/Under a genuine stop-hunt into buy-side/sell-side liquidity? Any fakeout/SFP visible around the level?
+5. **[ ] Price returns to the 61.8%–78.6% Fib zone**, ideally overlapping QML/MPL confluence.
+6. **[ ] Price action confirmation** on entry TF (M5/M1): Pin Bar, Engulfing, or a completed Compression/Inside-Bar breakout in the expected direction.
+7. **[ ] Stop loss defined** beyond the swing extreme (Over for sells, Under for buys) — **not** at the QML band edge; never at the obvious round number itself; add a `0.25 × ATR` buffer past the wick.
+8. **[ ] Take profit defined** using one of the three TP methods (Layer 4.3), matched to a minimum 1:2 R:R.
+9. **[ ] Position size calculated** per Section 7 before order is placed — never size intuitively.
+10. **[ ] Macro/news filter checked** — no major USD/gold-moving release (FOMC, NFP, CPI) within the next candle or two unless the setup explicitly trades the news-spike-fade pattern (Layer 2.2 #3).
 
 ---
 
@@ -227,7 +230,7 @@ This journal is the raw material for eventually converting this discretionary fr
 
 ## 10. Summary — The One-Paragraph Version
 
-Establish directional bias top-down using market structure (HH/HL vs LH/LL, BOS→CHoCH→MSS). Within that bias, hunt for a QM (Quasimodo) pattern — an Over/Under structure break that represents a genuine liquidity grab, ideally with QML and lower-timeframe MPL aligned for a "sharp entry," and ideally reinforced by a fakeout/compression/CPLQ setup. Enter on the 61.8–78.6% Fibonacci retracement into that zone, confirmed by price action (pin bar/engulfing/inside-bar breakout). Place the stop beyond the swing extreme, never at the obvious level. Target 1:2+ R:R using structure-based take-profit logic. Size every trade using the smallest of risk%/volatility%/margin% sizing, manage risk dynamically as the trade develops, and cap total portfolio risk — because the entry model only wins if the sizing survives long enough to let it work.
+Establish directional bias top-down using market structure (HH/HL vs LH/LL, BOS→CHoCH→MSS). Within that bias, hunt for a QM (Quasimodo) pattern — an Over/Under structure break that represents a genuine liquidity grab, **whose Head→Under departure leg leaves an FVG/imbalance ≥ 0.5 × ATR** (the Iteration-3 zone-quality gate), ideally with QML and lower-timeframe MPL aligned for a "sharp entry," and ideally reinforced by a fakeout/compression/CPLQ setup. Enter on the 61.8–78.6% Fibonacci retracement into that zone, confirmed by price action (pin bar/engulfing/inside-bar breakout). Place the stop **beyond the swing extreme (not at the zone edge)**, never at the obvious level. Target 1:2+ R:R using structure-based take-profit logic. Size every trade using the smallest of risk%/volatility%/margin% sizing, manage risk dynamically as the trade develops, and cap total portfolio risk — because the entry model only wins if the sizing survives long enough to let it work.
 
 ---
 
@@ -431,11 +434,77 @@ Our Iteration-1 QM enters at a **bare** `QML ± 0.10·ATR` band ∩ Fib window, 
 ## K.2 Prioritized, codeable changes (Iteration 3 candidates)
 Ranked by expected impact on the diagnosed root cause ("the ENTRY does not locate good reversals", Appendix J.5):
 
-- **[P1] Zone-at-QML + FVG departure filter** (K.1 #1, #2). New `patterns/zones.py`: detect RBR/DBR/DBD/RBD bases, require a departure FVG, keep only zones overlapping the fresh QML band. This is the single most promising lever and is directly testable.
-- **[P1] R:R-to-structure entry filter** (K.1 #4): skip QM setups whose distance to the next opposing structure is < `min_rr`. One function; high leverage; cheap.
-- **[P2] Zone-relative SL option** (K.1 #5) and **graded freshness** (K.1 #3): config toggles.
-- **[P3] RSI-divergence booster** (K.1 #6) and **late-retest wedge requirement** (K.1 #7): optional gates/size-scalers.
+- **[P1] Zone-at-QML + FVG departure filter** (K.1 #1, #2). New `patterns/zones.py`: detect RBR/DBR/DBD/RBD bases, require a departure FVG, keep only zones overlapping the fresh QML band. This is the single most promising lever and is directly testable. → **✅ BUILT & KEPT (`require_departure_fvg`, `min_departure_fvg_atr=0.5`). The one change in the whole project that moved OOS the right way — see Part V.**
+- **[P1] R:R-to-structure entry filter** (K.1 #4): skip QM setups whose distance to the next opposing structure is < `min_rr`. One function; high leverage; cheap. → **❌ TESTED USELESS: any binding threshold only worsened results; left in code but disabled (`min_rr_to_structure=0`).**
+- **[P2] Zone-relative SL option** (K.1 #5) and **graded freshness** (K.1 #3): config toggles. → **❌ Zone-relative SL FALSIFIED (Iteration 4, Part V); code kept inert (`stop_placement=swing`). Graded freshness not pursued.**
+- **[P3] RSI-divergence booster** (K.1 #6) and **late-retest wedge requirement** (K.1 #7): optional gates/size-scalers. → *not pursued (entry-quality lever already isolated to FVG).*
 - **[P4] Channel context** (K.1 #8): defer; ambiguous to automate well.
 
 ## K.3 Discipline
 This is genuinely NEW information (zone+imbalance confluence), not a re-tune of failed knobs — so it is a legitimate Iteration 3, not data-snooping. But the same bar applies: build → unit-test (no-lookahead: FVG uses only closed bars; zones from confirmed structure) → **walk-forward OOS on the 21.6-year gold set + the universe scan**, reporting OOS only. Acceptance unchanged (Appendix E). It may still fail; if the QML+zone+FVG+R:R version also shows no OOS edge, the QM concept on these markets is retired with high confidence.
+
+---
+
+# PART V — ITERATION 3 & 4 OUTCOMES + FORWARD-TEST STATUS
+> Added 2026-07-08. Records what actually happened when the Appendix K candidates were built and tested, in the same honest format as Appendix J.5. Reporting discipline unchanged: in-sample numbers are labelled as such; OOS is the verdict that counts.
+
+## L.1 Iteration 3 — FVG departure-quality filter — REAL, BUT INSUFFICIENT (the first non-mirage)
+**What was built:** `patterns/zones.py` (causal FVG/imbalance detection) + `qm.require_departure_fvg` / `qm.min_departure_fvg_atr`. A QM is discarded unless its Head→Under departure leg leaves a same-direction FVG ≥ 0.5 × ATR. (The companion `min_rr_to_structure` filter was built alongside and found useless — see K.2 — and is disabled.)
+
+**In-sample (21.6y gold M15, full costs):** baseline bare-QML −0.12R / PF 0.84 / 127 trades → **FVG ≥ 0.5: +0.115R / PF 1.22 / 44.9% win / 3.5% max DD / 69 trades.** Inverted-U over the threshold (any-gap −0.05, 0.5 best, 1.0 −0.02), i.e. not a monotone knob to max out — a genuine sweet spot. Fewer, higher-quality trades: the filter's whole job is to reject QMs that fire on a *bare* QML line with no real departure.
+
+**Out-of-sample — the part that matters:**
+- **Gold 4-window walk-forward:** the optimizer picked FVG ≥ 0.5 in **3/4 windows (stable pick**, unlike Iterations 1–2 where the winning param was noise) → stitched OOS **15 trades, −0.041R, PF 0.89, 40% win, 4.0% DD.** Much better than the Iteration-1 OOS baseline (−0.20R / PF 0.67) but **still sub-breakeven, and only 15 OOS trades (< the 30-trade bar).**
+- **Cross-sectional generalization:** applying the gold-tuned FVG ≥ 0.5 to other Exness instruments (~4y M15 each) — of 12 tradeable symbols, 7 improved / 5 worsened, mean ΔexpR ≈ +0.09R. It *reduces losses on losers* (USDJPY −0.62→−0.34, GBPUSD −0.23→−0.05) and amplifies pre-existing positives, but does **not manufacture an edge where none existed.**
+
+**Verdict:** the FVG-departure filter is the **first change in the entire project that moves OOS in the right direction on both gold walk-forward and cross-sectionally, with a stable parameter pick — so it is NOT a mirage.** But it is **not sufficient** to lift QM to a deployable edge: gold OOS is still ~breakeven-negative and the cross-section is only a weak positive lean. **Do not go live.** This confirms the entry (not the exit) was the binding constraint (Appendix J.5), and that entry *zone quality* is a real lever.
+
+## L.2 Iteration 4 — Zone-relative stop-loss — FALSIFIED IN-SAMPLE
+**What was built:** `stops_targets.stop_placement` (`swing` | `zone`) + `min_stop_atr_mult` floor. Hypothesis: anchoring the stop at the QML band edge (tighter than the swing/head liquidity-grab) shrinks risk and makes the `min_rr` target land closer / more reachable.
+
+**Result (in-sample, FVG ≥ 0.5 held fixed):** swing SL **+0.115R / PF 1.22 / 45% win** vs zone SL **−0.224R / PF 0.78 / 35% win**; flooring the zone stop wider (min 0.5 ATR) only recovers to −0.02R / PF 0.97 — still below both breakeven and the swing stop. **Monotonic: the wider stop is better.** The head stop beyond the liquidity grab gives the trade room; the tight zone stop gets noise-picked (win% 45→35). Walk-forward deliberately **not** run — an in-sample loser that can't beat baseline is OOS theater (same discipline as Appendix J).
+
+**Verdict:** zone-relative SL **retired**; the classic swing/head stop stays. Code remains in the repo (defaults inert: `stop_placement=swing`) for completeness. **Best configuration remains Iteration 3 = FVG ≥ 0.5 + swing SL.**
+
+## L.3 Current status — forward-testing to gather honest OOS data
+The strategy work has reached the limit of what historical data can decide: the Iteration-3 config is the best found, is ~breakeven OOS, and the honest next step is **real forward data, not more in-sample tuning.**
+
+- A shared-code-path MT5 live feed (`engine/feed.py::MT5LiveFeed`, read-only — orders go to the paper SimBroker, **zero capital at risk**) streams closed bars from a running Exness demo terminal into the exact backtest signal path.
+- A 12-symbol **basket forward-test** (`scripts/forwardtest_basket.py`, metals + FX majors, per-symbol spread-calibrated) runs all symbols concurrently to reach the ≥ 30-trade bar faster (QM+FVG setups are rare, ~30–40/yr basket-wide → months of calendar time).
+- **Acceptance (Appendix E, unchanged):** OOS PF ≥ 1.3, expectancy > 0 after costs, ≥ 30 trades. Backtest OOS expectation ≈ −0.04R, so the null hypothesis is "no edge." Forward results judge whether the FVG filter's weak-positive lean is real out-of-sample or noise.
+
+**If forward-test fails acceptance, the QM-on-gold concept is retired** (the engine, data pipeline and validation harness are strategy-agnostic — only `patterns/` + `strategy.py` are QM-specific — so a genuinely different strategy could be built on the same rails). **Until it passes, this remains research software: not for live capital.**
+
+---
+
+# PART VI — CONCEPT RETIRED (2026-07-09)
+> Added after two pre-registered experiments (an independent senior-quant audit) returned a decisive out-of-sample / out-of-symbol failure. The forward-test in L.3 was not waited out because a powered historical test could be run *now*, and it settled the question. Reporting discipline unchanged; every figure is tagged IS/OOS.
+
+## M.1 The two experiments
+**E2 — CHoCH-exit ablation (`use_choch_exit=false`, gold 21.6y M15).** Turning the exit off made results **worse**: +0.115R → **+0.030R**, PF 1.22 → 1.04, win 44.9% → 37.7%, DD 3.5% → 5.1%, longest losing streak 4 → 9 **[all IS]**. Mechanism: the 16 CHoCH exits were *cutting 12 losers from −1.10R to −0.05R* (a ~+0.08R/trade save) — the exit is beneficial, not a leak. (The audit's initial "−0.05R × 16 = leak" reading was wrong: the counterfactual for those trades is the −1.10R stop, not zero.) **Decision: keep `use_choch_exit=true`.** No free expectancy here.
+
+**E1 — Frozen-config 12-symbol portfolio backtest (`scripts/portfolio_backtest.py`).** The frozen gold Iteration-3 config (FVG ≥ 0.5, swing SL, **no per-symbol re-tuning** — only per-symbol cost calibration) applied to the metals + FX-majors/crosses basket. Because the parameters came from gold, the 11 non-gold symbols are a genuine **out-of-symbol OOS** test. MT5 demo caps M15 history at ~4y/symbol, so N is data-limited.
+
+| Pooled OOS basket (11 non-gold symbols) | value **[OOS]** | acceptance |
+|---|---|---|
+| aggregate N | 160 | ≥ 200 ✗ (data cap) |
+| pooled expectancy | **−0.156 R** | > 0 ✗ |
+| pooled profit factor | **0.763** | ≥ 1.3 ✗ |
+| win rate | 35.0% | — |
+| t-stat (H₀: E[R]=0) | −1.53 | — |
+| max single-symbol PnL share | 42% | ≤ 40% ✗ |
+| mean pairwise monthly-R correlation | −0.001 | — |
+| **acceptance** | **FAIL (all axes)** | |
+
+The only positive OOS symbols were the lowest-N ones (GBPJPY +1.20R / n=4; EURJPY +0.81R / n=7); **every higher-N symbol was negative** (USDCAD −0.33 / n=23, EURGBP −0.63 / n=21, NZDUSD −0.15 / n=20, USDCHF −0.26 / n=18, GBPUSD −0.11 / n=17). As N-per-symbol rises, expectancy goes negative — the "winners" are the small-sample tail. Gold's own 4y MT5 slice read +0.80R / 8 trades here versus its 21.6y truth of +0.115R **[IS]** / −0.04R **[OOS]**, a live demonstration that the short windows lie.
+
+## M.2 Why breadth cannot rescue it
+Mean cross-symbol monthly-R correlation ≈ 0 (−0.001), so the symbols *are* independent and breadth genuinely multiplies trade count toward statistical power. But **averaging a basket of independent negative-EV components converges to the negative mean** — breadth fixes the *frequency/power* problem, it cannot manufacture an *edge* that is not present. (The earlier "+0.09 ΔexpR, 7/12 improved" was a delta versus each symbol's own baseline — the filter cuts losses on losers — not absolute positive expectancy. In absolute terms the basket loses.)
+
+## M.3 Power reality
+Per-trade σ ≈ 1.27R **[IS]** against an edge of order +0.1R implies **~755 trades** are needed to distinguish the edge from zero at 95%/80% power. At the basket rate (~30–40 trades/yr) that is 20+ years of forward-testing; the Appendix E n ≥ 30 bar can only detect an effect of ~+0.58R — five times anything observed. A "passing" 30-trade / PF-1.3 forward result would carry t ≈ 0.56 (p ≈ 0.29): not distinguishable from luck.
+
+## M.4 Verdict
+**The QM (Quasimodo) concept on gold and this FX/metals universe is retired.** Every independent line of evidence agrees: Iteration-1 OOS failure, the entry funnel, Iteration-2 (exit) falsified, the universe scan, the gold walk-forward (−0.04R), and now the out-of-symbol basket (−0.156R / PF 0.76). The FVG departure filter was a real refinement — but it refines a non-edge.
+
+The **engine, data pipeline, cost model, walk-forward harness and forward-test infrastructure are strategy-agnostic** (only `patterns/` + `strategy.py` are QM-specific). The recommended next move is to reuse these rails for a **higher-frequency strategy class**, where powered validation is reachable in months rather than decades. This document is preserved as the honest, complete record of a rigorously-tested idea that did not clear the bar.

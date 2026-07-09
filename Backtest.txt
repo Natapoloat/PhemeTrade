@@ -1,0 +1,72 @@
+Here's the current strategy (Iteration 3: FVG≥0.5 departure filter + swing SL) backtested on 21.6 years of XAUUSD M15, 2004-06 → 2026-01, full costs.
+
+  Headline
+
+  ┌──────────────────┬───────────────────────┬────────────────────────────────────────┐
+  │      metric      │         value         │                  read                  │
+  ├──────────────────┼───────────────────────┼────────────────────────────────────────┤
+  │ trades           │ 69                    │ ~3.2/yr — extremely sparse             │
+  ├──────────────────┼───────────────────────┼────────────────────────────────────────┤
+  │ expectancy       │ +0.1148 R             │ positive, but in-sample                │
+  ├──────────────────┼───────────────────────┼────────────────────────────────────────┤
+  │ win rate         │ 44.9%                 │ above the ~38% breakeven               │
+  ├──────────────────┼───────────────────────┼────────────────────────────────────────┤
+  │ profit factor    │ 1.22                  │ thin edge                              │
+  ├──────────────────┼───────────────────────┼────────────────────────────────────────┤
+  │ net PnL          │ +$3,609 on $100k      │ +3.6% total                            │
+  ├──────────────────┼───────────────────────┼────────────────────────────────────────┤
+  │ CAGR             │ 0.16%                 │ economically ~zero                     │
+  ├──────────────────┼───────────────────────┼────────────────────────────────────────┤
+  │ max drawdown     │ 3.5%                  │ small (because risk is 0.5%/trade)     │
+  ├──────────────────┼───────────────────────┼────────────────────────────────────────┤
+  │ DD duration      │ 3,867 days ≈ 10.6 yrs │ at some point, underwater for a decade │
+  ├──────────────────┼───────────────────────┼────────────────────────────────────────┤
+  │ Sharpe / Sortino │ 0.20 / 0.02           │ near-zero risk-adjusted                │
+  └──────────────────┴───────────────────────┴────────────────────────────────────────┘
+
+  What the breakdown reveals
+
+  The edge is entirely one-sided (short/bearish bias):
+
+  ┌─────────┬────────┬────────────┬──────┐
+  │  bias   │ trades │ expectancy │  PF  │
+  ├─────────┼────────┼────────────┼──────┤
+  │ bearish │ 30     │ +0.273 R   │ 1.61 │
+  ├─────────┼────────┼────────────┼──────┤
+  │ bullish │ 32     │ +0.064 R   │ 1.09 │
+  ├─────────┼────────┼────────────┼──────┤
+  │ ranging │ 7      │ −0.329 R   │ 0.29 │
+  └─────────┴────────┴────────────┴──────┘
+
+  Strip the 30 bearish-bias trades and the remaining 39 are ~breakeven-to-negative. The whole positive number rides on shorts — on an asset with a secular
+  uptrend. That's a concentration/fragility flag, not a robustness signal.
+
+  Exit accounting confirms the known leaks:
+
+  ┌────────────┬────────┬─────────────────────────────────────────────────────┐
+  │    exit    │ trades │                        avg R                        │
+  ├────────────┼────────┼─────────────────────────────────────────────────────┤
+  │ target     │ 23     │ +1.81 (planned +2.0 → cost drag)                    │
+  ├────────────┼────────┼─────────────────────────────────────────────────────┤
+  │ stop       │ 30     │ −1.09 (planned −1.0 → SL slippage bleeds ~9%)       │
+  ├────────────┼────────┼─────────────────────────────────────────────────────┤
+  │ choch_exit │ 16     │ −0.05 (net negative — the CHoCH exit isn't helping) │
+  └────────────┴────────┴─────────────────────────────────────────────────────┘
+
+  Sessions/vol: best in London/NY single-session (PF 1.5/1.22), weakest in the overlap (PF 1.09); needs high-vol regime (52 of 69 trades).
+
+  Honest verdict
+
+  Three things to hold in mind together:
+
+  1. This is the in-sample number. The out-of-sample walk-forward on this exact filter came in at −0.04 R / PF 0.67–0.89 (per the validation log). So +0.115
+  R is the optimistic end; the honest expectation is ~breakeven-negative. The FVG filter was the first change in the project to move OOS the right way at
+  all — real, but not sufficient.
+  2. Even taking +0.115 R at face value, it's untradeable as an economic strategy. 3.6% over 21.6 years, CAGR 0.16%, and a ~10.6-year max drawdown duration.
+  Three trades a year at 0.5% risk cannot compound into anything, and no human sits through a decade underwater on a 3.5% edge.
+  3. Two identifiable leaks are still in the config: the CHoCH exit is net-negative (−0.05 R × 16), and stops realize −1.09 R vs −1.0 R planned. Turning off
+  use_choch_exit is a cheap, honest ablation worth checking — but it won't change the fundamental verdict.
+
+  Bottom line: the number is genuinely positive in-sample and the FVG filter is the one real improvement found, but the strategy has no deployable edge —
+  the OOS is ~breakeven and the economics (frequency, CAGR, DD duration, single-sided concentration) are non-viable. This is exactly why the current phase
+  is forward-testing to gather honest OOS data, not going live.
