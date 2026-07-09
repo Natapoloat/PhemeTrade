@@ -96,6 +96,17 @@ class StopsTargetsConfig(BaseModel):
         0.0, ge=0.0,
         description="K.1 #4: skip a QM entry if room to the opposite structure "
                     "(pattern UNDER/OVER) gives < this many R (0 = filter off)")
+    # Iteration 4 (Appendix K.1 #3) — zone-relative stop placement. "swing"
+    # anchors the stop beyond the head liquidity-grab (wide, pattern-invalidation
+    # based); "zone" anchors it just beyond the QML supply/demand zone boundary
+    # (tighter -> the min_rr target lands closer, more reachable on a strategy
+    # whose moves are small). Buffer beyond the anchor stays stop_atr_mult * ATR.
+    stop_placement: Literal["swing", "zone"] = Field(
+        "swing", description="K.1 #3: stop anchor — head extreme vs QML zone boundary")
+    min_stop_atr_mult: float = Field(
+        0.0, ge=0.0,
+        description="floor on stop distance in ATR units; widen a too-tight zone "
+                    "stop to entry +/- this * ATR (0 = no floor; guards noise stop-outs)")
 
 
 class IndicatorConfig(BaseModel):

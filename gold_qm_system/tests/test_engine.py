@@ -138,6 +138,28 @@ def test_rr_to_structure_filter(monkeypatch):
     assert len(run_backtest(qm_config(), qm_frame()).trades) == 1
 
 
+def test_zone_stop_placement_tightens_stop_and_target(monkeypatch):
+    """Appendix K.1 #3: anchoring the stop at the QML zone boundary (band top for
+    a sell) instead of the head liquidity-grab yields a tighter stop, and the
+    min_rr target therefore lands closer to entry. Same entry, still a target
+    exit — only the geometry moves."""
+    swing = run_backtest(qm_config(), qm_frame())
+    base = qm_config().model_dump()
+    base["stops_targets"]["stop_placement"] = "zone"
+    zone = run_backtest(SystemConfig.model_validate(base), qm_frame())
+
+    assert len(swing.trades) == 1 and len(zone.trades) == 1
+    sw, zn = swing.trades[0], zone.trades[0]
+    assert sw.direction == zn.direction == "sell"
+    assert zn.entry_price == sw.entry_price                  # entry logic unchanged
+    # stop anchored at band_hi(=110+tol) < head(115) -> strictly tighter
+    assert zn.meta["init_stop"] < sw.meta["init_stop"]
+    assert zn.meta["init_stop"] > zn.entry_price             # still a valid sell stop
+    # tighter risk -> higher (closer) sell target price -> higher target exit
+    assert sw.exit_reason == zn.exit_reason == "target"
+    assert zn.exit_price > sw.exit_price
+
+
 def test_no_trade_without_price_action_when_no_trigger():
     """Remove the pin bar (b10 becomes a bland zone-touch): with the PA layer
     ON there is no trigger -> no trade; with PA OFF the armed touch trades."""

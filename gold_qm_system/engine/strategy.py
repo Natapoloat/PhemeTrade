@@ -305,10 +305,21 @@ class QMStrategy:
         """Returns True if the level was consumed (order attempted), False if a
         quality gate rejected it (level stays fresh)."""
         atr_setup = self.setup.atr.value or 0.0
+        st = self.cfg.stops_targets
+        anchor = pat.zone_stop_anchor if st.stop_placement == "zone" else pat.stop_extreme
         stop, target = build_stop_and_target(
-            pat.direction, close, pat.stop_extreme, atr_setup,
-            self.cfg.stops_targets.stop_atr_mult, self.cfg.stops_targets.min_rr,
-            self.cfg.stops_targets.exit_mode)
+            pat.direction, close, anchor, atr_setup,
+            st.stop_atr_mult, st.min_rr, st.exit_mode,
+            min_stop_dist=st.min_stop_atr_mult * atr_setup)
+
+        # a zone-anchored stop can land on the wrong side of entry when the
+        # trigger bar closed beyond the zone (only possible in the QML-band-only
+        # ablation path, where `close` is unconstrained). Reject rather than
+        # submit a position whose stop is already breached.
+        wrong_side = (stop <= close) if pat.direction == "sell" else (stop >= close)
+        if wrong_side:
+            self._skip(time, "stop_wrong_side")
+            return False
 
         # R:R-to-structure entry filter (Appendix K.1 #4): require enough room to
         # the opposite structure (the pattern's UNDER for sells / OVER for buys).

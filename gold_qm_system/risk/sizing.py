@@ -78,17 +78,25 @@ def build_stop_and_target(
     stop_atr_mult: float,
     min_rr: float,
     exit_mode: Literal["fixed_rr", "trail_structure"] = "fixed_rr",
+    min_stop_dist: float = 0.0,
 ) -> tuple[float, float]:
-    """Appendix A.7 / J.2: stop beyond the swing extreme with an ATR buffer.
+    """Appendix A.7 / J.2 / K.1 #3: stop beyond `swing_extreme` (the head extreme
+    for classic placement, or the zone boundary for zone-relative placement) with
+    an ATR buffer. `min_stop_dist` floors the risk distance so a tight zone stop
+    is widened away from `entry`, guarding against noise stop-outs.
     fixed_rr -> take-profit at min_rr * risk. trail_structure -> no fixed
     target (returns +/-inf; exits come from the trailing stop, Appendix J.2)."""
     buffer = stop_atr_mult * atr_value
     if direction == "sell":
         stop = swing_extreme + buffer
+        if min_stop_dist > 0 and (stop - entry) < min_stop_dist:
+            stop = entry + min_stop_dist
         risk = stop - entry
         target = -math.inf if exit_mode == "trail_structure" else entry - min_rr * risk
     else:
         stop = swing_extreme - buffer
+        if min_stop_dist > 0 and (entry - stop) < min_stop_dist:
+            stop = entry - min_stop_dist
         risk = entry - stop
         target = math.inf if exit_mode == "trail_structure" else entry + min_rr * risk
     return stop, target

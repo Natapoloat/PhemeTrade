@@ -62,6 +62,13 @@ class QMPattern:
         """Swing extreme the stop sits beyond (A.7): head high (sell) / low (buy)."""
         return self.head.price
 
+    @property
+    def zone_stop_anchor(self) -> float:
+        """K.1 #3: the QML supply/demand zone boundary on the stop side — band top
+        for a sell, band bottom for a buy. Tighter than the head extreme, so a
+        min_rr target computed off it lands closer to entry."""
+        return self.band_hi if self.direction == "sell" else self.band_lo
+
     def bar_touches_band(self, high: float, low: float) -> bool:
         return high >= self.band_lo and low <= self.band_hi
 

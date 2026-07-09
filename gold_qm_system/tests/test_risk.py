@@ -97,6 +97,31 @@ def test_stop_and_target_buy():
     assert target == 90.0 + 2.0 * 5.5
 
 
+def test_zone_stop_min_dist_floor_widens_tight_stop():
+    """K.1 #3: a zone-anchored stop too close to entry is widened to the ATR
+    floor, and the min_rr target is recomputed off the floored risk."""
+    # sell: zone boundary 110.2 is only 0.2 above entry 110 -> floor to 1.0*ATR
+    stop, target = build_stop_and_target("sell", entry=110.0, swing_extreme=110.2,
+                                         atr_value=2.0, stop_atr_mult=0.0, min_rr=2.0,
+                                         min_stop_dist=2.0)             # 1.0 * ATR(2.0)
+    assert stop == 112.0                                     # entry + floor, not 110.2
+    assert target == 110.0 - 2.0 * 2.0                       # 2R off the floored risk
+    # buy mirror
+    b_stop, b_target = build_stop_and_target("buy", entry=90.0, swing_extreme=89.9,
+                                             atr_value=2.0, stop_atr_mult=0.0, min_rr=2.0,
+                                             min_stop_dist=2.0)
+    assert b_stop == 88.0
+    assert b_target == 90.0 + 2.0 * 2.0
+
+
+def test_zone_stop_floor_inactive_when_stop_already_wide_enough():
+    """The floor only widens; a stop already beyond the floor is untouched."""
+    stop, _ = build_stop_and_target("sell", entry=110.0, swing_extreme=115.0,
+                                    atr_value=2.0, stop_atr_mult=0.25, min_rr=2.0,
+                                    min_stop_dist=1.0)          # 5.5 >> 1.0 floor
+    assert stop == 115.5                                        # unchanged
+
+
 def test_trail_structure_mode_has_no_fixed_target():
     """Appendix J.2: trail_structure returns an infinite target (exits come
     from the trailing stop), while the stop is identical to fixed mode."""
