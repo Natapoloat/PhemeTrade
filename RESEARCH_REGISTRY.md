@@ -316,7 +316,36 @@ counterparty). Dead-on-paper theses do not consume the budget's "pass" slots but
 logged. **If all three die, the project concludes as a powered negative result and we
 write it up as the final deliverable.** Futures is a VENUE option to layer under any
 paper-passer — never itself a thesis. Theses so far: [1] carry (DEAD), [2] turn-of-month
-(conditional — power-marginal), [3] open.
+(conditional — power-marginal), [3] crypto calendar (PAPER-PASS — strongest lead).
+
+## Structural thesis 3 — CRYPTO CALENDAR / liquidity-cycle (BTC+ETH): PAPER-PASS
+Day-of-week + weekend structure. Counterparty (G2): weekend/off-hours institutional
+absence → retail-flow-driven liquidity-cycle mispricing that normalizes when desks return.
+1. **Cost/G8 (correct swaps + triple-swap-day, R=2·ATR_D1):** crypto's huge ATR dwarfs the
+   swap → PASS comfortably at 1–3n even long+triple: BTC 3n=0.054R, ETH 0.023R; short side
+   ~0.014–0.018R. The swap wall does NOT bind on crypto (unlike metals/indices). Not the kill.
+2. **Sessions:** BTC & ETH are **24/7** (Mon=Sat=Sun bar counts) → weekend exposure is
+   HOLDABLE/continuous, not a gap trade; swaps accrue every night incl. weekends.
+3. **Power:** BTC-ETH daily corr 0.83; per day-of-week ~262 weekly obs each → raw pooled
+   ~525, effective N ≈ **307 (in the 200–450 band → POWERED full-sample)**. Pre/post-2022
+   split ~154/half → sign-consistency check (not per-half significance). Best power of the
+   three theses (vs ToM's ~79–118 monthly).
+4. **Contamination:** crypto AGGREGATE returns were seen in trend runs (BTC positive; dev is
+   60% pre-2022 = the 2020–21 bull), but calendar SLICES were not. **Design MUST be
+   drift-neutral** — day-of-week EXCESS vs each asset's unconditional daily mean (or a
+   long-short across days) — else it just re-discovers the BTC bull. Slice PnL unseen;
+   verdict on sealed holdout + forward.
+**Verdict: PAPER-PASS on all four gates (with the drift-neutral design constraint).**
+Strongest structural lead. Eligible for full pre-registration.
+
+### Crypto-calendar — pre-registration DRAFT (awaiting sign-off; not built)
+Universe {BTCUSD, ETHUSD}. Primary rule (ex-ante liquidity rationale, single — no day-sweep):
+the low-liquidity **weekend window** (Fri-close → Mon-open, ~2–3 nights), measured
+**drift-neutral** (excess over unconditional daily mean). Vol-scaled 0.5%/trade, stop
+2·ATR_D1, correct swaps. Kill line: pooled drift-neutral excess net expR ≤ 0 OR not
+sign-consistent across the pre/post-2022 split → closed. Sign to be confirmed on dev
+(powered) and locked before the sealed holdout. [weekend-window + drift-neutral flagged
+for sign-off.] **Status: DRAFT.**
 
 ## Structural thesis 1 — CARRY: PAPER-KILLED (2026-07-10)
 For each FX pair, actual Exness swap yield (mode-1) vs the policy-rate differential
