@@ -288,7 +288,25 @@ A FRESH hypothesis (not a port of D1-trend): H4 channel-breakout trend, own para
 - **Contamination:** D1 per-symbol PnL was seen (C4-D1 split) but **H4 per-symbol PnL has
   NOT** — only holds/counts. So H4 dev is legitimate primary evidence (walk-forward), with
   the sealed 2.5y holdout as final confirmation. This is H4's key edge over the D1 shot.
-- **Status: DRAFT, awaiting sign-off. Not built. D1 holdout remains sealed.**
+- **Status: RUN + KILLED 2026-07-10 (dev, powered).**
+
+## H4-trend — VERDICT: KILLED, powered + clean (2026-07-10)
+`scripts/h4_trend.py`, primary universe, dev only, correct full swaps. **Pooled N=736,
+net +0.0038R, PF 1.011, t=+0.09** — indistinguishable from zero. Per-symbol: BTC
++0.218/PF1.63, ETH +0.02/1.05, USOIL −0.074/0.78, UKOIL −0.16/0.58, JP225 −0.006/0.98
+→ **2/5 net-positive**; kill line HIT (PF<1.2) and majority-positive FAILED. Even GROSS
+the basket is ~PF 1.1 (BTC gross 1.89, ETH 1.2, rest <1.05) → swaps are not the killer;
+**there is no H4 trend edge.** This is the powered (N=736, not D1's ~110), uncontaminated
+(H4 PnL never pre-seen) test — the most trustworthy trend result — and it is NULL. The
+lone BTC positive mirrors the D1 BTC number, i.e. the D1 "trending-asset split" was the
+small-sample tail (5× the data on the same assets → edge vanishes). **D1 holdout NOT run
+(dev failed → sealed shot preserved).** Swap-free (Lever 1) cannot rescue it (gross already
+~1.1). CONCLUSION: the trend lever on the Exness spot universe, at its best-powered/lowest-
+relative-cost version, has no edge → the Exness D1+ trend lever is effectively closed.
+Remaining honest moves: futures (venue, pending capital-granularity check) or a
+non-trend/structural-counterparty vehicle change.
+
+## H4-trend — pre-registration (frozen spec, executed above)
 
 ## G8 — cost-ceiling gate (paper, mandatory before any implementation)
 Derived from the powered negative result (see `TECHNICAL_SEARCH_CONCLUSION.md`).
