@@ -317,10 +317,10 @@ logged. **If all three die, the project concludes as a powered negative result a
 write it up as the final deliverable.** Futures is a VENUE option to layer under any
 paper-passer — never itself a thesis. Theses so far: [1] carry (DEAD), [2] turn-of-month
 (conditional — power-marginal, PARKED/unrun), [3] crypto calendar (paper-passed then
-DEV-FAILED: excess t=−1.80 + sign flip pre/post-2022). **Budget spent: 3/3 scoped.**
-Two dead (carry, crypto-cal), one parked-unrun (ToM, power-marginal + same calendar-decay
-prior the crypto sign-flip just demonstrated). Decision pending: run ToM as the last shot,
-or conclude the project as a powered negative result.
+DEV-FAILED), [3-last] turn-of-month (DEV-FAILED all 3 gates). **Budget 3/3 → ALL DEAD.
+PROJECT CONCLUDED as a powered negative result → `PROJECT_CONCLUSION.md` (the final
+deliverable). D1 holdout sealed and never spent. Reopening requires an out-of-scope venue
+(futures) or data-class change, scoped fresh through G8 + pre-registration.**
 
 ## Structural thesis 3 — CRYPTO CALENDAR / liquidity-cycle (BTC+ETH): PAPER-PASS
 Day-of-week + weekend structure. Counterparty (G2): weekend/off-hours institutional
@@ -406,12 +406,44 @@ inflows, window-dressing) → documented turn-of-month return concentration. Lon
   pre-registration, but the effect-size/decay is the real gate; the honest verdict would
   rest on the sealed holdout + forward given effective N is monthly-limited.
 
-### Turn-of-month — pre-registration DRAFT (awaiting sign-off; not built)
-Universe {US30, US500, USTEC, UK100, JP225}; long at last-trading-day close, exit 3rd
-trading day of next month; vol-scaled 0.5%/trade, stop 2·ATR_D1; correct swaps. Single
-rule, no grid. Kill line: pooled net expR ≤ 0 OR PF < 1.3 → closed; require majority of
-indices net-positive. Power caveat above front-and-center. Turn-of-month returns NOT yet
-inspected → clean. **Status: DRAFT.**
+### Turn-of-month — pre-registration FINAL (last shot, 2026-07-10)
+**Thesis (single, ex-ante — no variants):** equity-index returns concentrate around the
+month turn (scheduled institutional rebalancing/inflows/window-dressing).
+**Window (fixed, per-index session via each index's own D1 close):** enter at the D1 close
+of the **last trading day of the calendar month**, exit at the D1 close of the **3rd trading
+day of the next month** (~3 sessions/nights — the hold the 3-night G8 was computed at). Each
+index uses its own daily-close timestamp (US ~21:00 UTC, UK ~15:30/16:30, JP ~06:00); the
+turn is defined by the trading-day calendar, not a clock. One rule.
+**Universe:** {US30, US500, USTEC, UK100, JP225}. **Verdict is the POOLED 5-index basket
+(excess averaged per month to respect the ~0.8 cross-index correlation); per-symbol salvage
+is pre-declared INVALID.**
+**Direction (two-sided):** drift-neutral **excess** (raw 3-day turn return − unconditional
+daily drift × 3) tested two-sided on dev; sign must be **consistent across pre/post-2021-01**
+(mid-dev split). Holdout would be evaluated one-sided in the dev direction — IF a holdout is
+opened (see outcome handling).
+**Sizing/costs:** vol-scaled 0.5%/trade, R = 2·ATR_D1; round-trip spread + correct swaps
+over 3 nights (mode-1).
+**Kill line (ALL three; economic derived from the 3-night G8 numbers):**
+1. ECONOMIC — pooled net expectancy after spread+3·swap ≥ **+0.05 R** (clears the pooled
+   3-night G8 drag ~0.05–0.09R/index with margin);
+2. STATISTICAL — pooled excess **|t| ≥ 2.0**;
+3. ROBUSTNESS — excess **same sign** pre/post-2021-01.
+**PRE-COMMITTED OUTCOME HANDLING (fixed before the run):**
+- Any gate FAIL → **conclude the project.**
+- Marginal / underpowered positive (e.g. right sign but |t|<2, or economic just over floor
+  on the ~79-month effective sample) → **recorded as INCONCLUSIVE, conclude anyway** — the
+  power math already said this test cannot confirm a small effect.
+- **Only a clean three-gate pass opens a holdout discussion.**
+Turn-of-month returns NOT yet inspected → clean. Holdout sealed. **Status: FINAL.**
+
+### Turn-of-month — DEV VERDICT: FAILED, all three gates (2026-07-10)
+`scripts/turn_of_month.py`, dev only (holdout sealed). Pooled 5-index basket, N=81 months.
+**excess mean +0.00125, t=+0.63 (stat FAIL); pre-2021 −0.00012 vs post-2021 +0.00265 →
+sign FAIL; economic net +0.023R < +0.05 floor (econ FAIL).** All three gates fail → per the
+pre-committed handling, **conclude.** The turn-of-month effect is essentially absent in
+2018–2024 — the documented secular decay, confirmed. **Holdout NOT run (preserved).**
+**Structural budget 3/3 → ALL DEAD (carry, crypto-cal, turn-of-month) → PROJECT CONCLUDES
+as a powered negative result. See PROJECT_CONCLUSION.md.**
 
 ## G8 — cost-ceiling gate (paper, mandatory before any implementation)
 Derived from the powered negative result (see `TECHNICAL_SEARCH_CONCLUSION.md`).
