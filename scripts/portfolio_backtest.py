@@ -69,8 +69,9 @@ def symbol_config(base: SystemConfig, symbol: str) -> SystemConfig:
     info = mt5.symbol_info(symbol)
     point = info.point
     spread_px = max(info.spread, 1) * point
-    swap_long = info.swap_long * point if info.swap_mode == 0 else 0.0
-    swap_short = info.swap_short * point if info.swap_mode == 0 else 0.0
+    # swap_mode 1 = POINTS (Exness) -> price = swap * point; mode 0 = disabled -> 0.
+    swap_long = info.swap_long * point if info.swap_mode == 1 else 0.0
+    swap_short = info.swap_short * point if info.swap_mode == 1 else 0.0
     d = base.model_dump()
     d["symbol"] = symbol
     d["costs"].update({

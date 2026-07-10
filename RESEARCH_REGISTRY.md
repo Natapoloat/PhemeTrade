@@ -195,6 +195,59 @@ scheduled) = 192 events → ~32/yr on gold alone, so C3 power is thin single-sym
   trending classes on D1+ is a legitimately NEW hypothesis needing its own
   pre-registration AND a D1 data extension for real N — not a rescue of C4-D1.
 
+## D1+ lever, Step 1 — swap-aware cost model + G8 recompute (2026-07-10) → PASS (pruned)
+**Bug found:** Exness reports `swap_mode == 1` (POINTS) for all symbols, but the cost
+code applied swaps only for `swap_mode == 0` (DISABLED) → **every backtest, C4-D1
+included, charged ZERO overnight financing.** Fixed (`==1`) in c4_basket + portfolio_backtest.
+**Swaps are the dominant D1 cost** (spread ~0.01R; swap 0.03–0.16R over a hold).
+`scripts/swap_g8_scope.py` (`output/swap_g8_scope.csv`): cost_drag_R(H) = [3·spread +
+swap/night·H]/(3·ATR_D1); G8 ceiling 0.10R (needs gross ≥0.30R at 3×). Actual C4-D1
+median holds = 15–20 nights (p75 25–28), direction ~52–68% long. Verdict at real holds:
+- **Robust** (pass at median & p75): **BTC, ETH (crypto); USOIL, UKOIL (energy); JP225
+  (index, zero swap).**
+- **Marginal** (pass at median, FAIL beyond ~12n): **gold (be 12n vs 18n hold), US30
+  (be 11n vs 16n)** — gold, a C4-D1 "winner", is demoted once financing is charged.
+- **Fail at 10n:** silver, US500, USTEC, UK100 (high swap/ATR).
+**Step 1 PASSES with a pruned universe** (~5 robust + 2 marginal). NOT killed — but the
+robust core is small and within-class correlated (crypto, energy), a power caveat for
+Steps 2–3. Recorded C4-D1 net (−0.054R) was swap-FREE and is therefore optimistic;
+Step 3's pre-registered run will apply correct swaps.
+
+## D1+ lever, Step 2 — depth + power math (2026-07-10)
+D1/H4 reach 2018 without any Max-bars change (only M15 was capped). Dev depth (pre
+2024-01-09): D1 ~1000–1840 bars/symbol; H4 ~4250–6440. **Power wall:** measured D1
+trades ~25–38/symbol → robust core (5) ≈ 159 dev trades (~110 effective after
+crypto/energy within-class correlation). Trend σ ≈ 1.7R ⇒ need n ≈ 447 (μ=0.20R) /
+286 (0.25) / 198 (0.30) to separate the edge from zero. **D1-only is UNDERPOWERED**
+(~110–160 « 200–450); holdout adds ~75, forward ~30/yr. H4 would give ~3–4× the N
+(→ powerable) but needs its own Step-1 G8 with H4 costs — DEFERRED, not smuggled in.
+Consequence for Step 3: dev cannot confirm; the verdict must rest on the sealed
+holdout + forward test + cross-symbol consistency, and may honestly return
+"insufficient power on Exness D1" → venue/vehicle change.
+
+## D1+ lever, Step 3 — pre-registration: "D1 trend, asset-class basket" (2026-07-10)
+**NEW hypothesis, frozen before any strategy code.** Mechanism/universe chosen by
+**ex-ante rationale** (trend/time-series-momentum premium is documented in commodities,
+equity indices, crypto — negative-skew risk-transfer; FX majors are carry/range, not
+trend → **excluded**), intersected with the Step-1 swap-cost survivors:
+- **Robust universe (primary):** BTCUSD, ETHUSD, USOIL, UKOIL, JP225.
+- **Marginal group (reported separately, hold-monitored):** XAUUSD, US30 — swap-marginal
+  (break-even ~11–12 nights vs 16–18 night holds); included only to watch, not to rescue.
+- **Out:** all FX majors/crosses (literature) + silver/US500/USTEC/UK100 (failed G8).
+**Frozen params (no re-tune):** Donchian L=55, no vol gate, chandelier 3×ATR trail,
+ATR(21), TF = **D1**. **Sizing fixed ex-ante:** risk 0.5%/trade, stop = 3×ATR ⇒ size
+∝ 1/ATR (vol-scaled, equal risk per trade). **Costs:** per-symbol spread + **correct
+swaps (mode-1 fix)**, spread_cap scaled. H4 explicitly deferred to its own gate.
+**Kill line:** pooled robust-core, swap-inclusive — net expR ≤ 0 OR PF < 1.2 → the
+Exness D1 lever is closed. Given underpower, ALSO require majority of robust-core
+symbols net-positive (no single-symbol fluke).
+**CONTAMINATION NOTE (mandatory):** we have already seen the C4-D1 split (crypto/energy/
+gold looked positive). Development/in-sample is therefore CONTAMINATED and is NOT
+evidence. **The verdict rests solely on the sealed 2.5y holdout (evaluated once, last)
++ a forward test**, plus cross-symbol consistency. If those are inconclusive (likely,
+given the power math), the honest verdict is "no demonstrable D1 edge reachable on
+Exness" → next is venue (futures) or vehicle change. **Status: registered, not built.**
+
 ## G8 — cost-ceiling gate (paper, mandatory before any implementation)
 Derived from the powered negative result (see `TECHNICAL_SEARCH_CONCLUSION.md`).
 For the candidate's TF/symbol/stop: `cost_drag_R ≈ cost_per_ATR / s` (cost_per_ATR
