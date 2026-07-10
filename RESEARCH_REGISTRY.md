@@ -316,7 +316,11 @@ counterparty). Dead-on-paper theses do not consume the budget's "pass" slots but
 logged. **If all three die, the project concludes as a powered negative result and we
 write it up as the final deliverable.** Futures is a VENUE option to layer under any
 paper-passer — never itself a thesis. Theses so far: [1] carry (DEAD), [2] turn-of-month
-(conditional — power-marginal), [3] crypto calendar (PAPER-PASS — strongest lead).
+(conditional — power-marginal, PARKED/unrun), [3] crypto calendar (paper-passed then
+DEV-FAILED: excess t=−1.80 + sign flip pre/post-2022). **Budget spent: 3/3 scoped.**
+Two dead (carry, crypto-cal), one parked-unrun (ToM, power-marginal + same calendar-decay
+prior the crypto sign-flip just demonstrated). Decision pending: run ToM as the last shot,
+or conclude the project as a powered negative result.
 
 ## Structural thesis 3 — CRYPTO CALENDAR / liquidity-cycle (BTC+ETH): PAPER-PASS
 Day-of-week + weekend structure. Counterparty (G2): weekend/off-hours institutional
@@ -338,14 +342,45 @@ absence → retail-flow-driven liquidity-cycle mispricing that normalizes when d
 **Verdict: PAPER-PASS on all four gates (with the drift-neutral design constraint).**
 Strongest structural lead. Eligible for full pre-registration.
 
-### Crypto-calendar — pre-registration DRAFT (awaiting sign-off; not built)
-Universe {BTCUSD, ETHUSD}. Primary rule (ex-ante liquidity rationale, single — no day-sweep):
-the low-liquidity **weekend window** (Fri-close → Mon-open, ~2–3 nights), measured
-**drift-neutral** (excess over unconditional daily mean). Vol-scaled 0.5%/trade, stop
-2·ATR_D1, correct swaps. Kill line: pooled drift-neutral excess net expR ≤ 0 OR not
-sign-consistent across the pre/post-2022 split → closed. Sign to be confirmed on dev
-(powered) and locked before the sealed holdout. [weekend-window + drift-neutral flagged
-for sign-off.] **Status: DRAFT.**
+### Crypto-calendar — pre-registration FINAL (signed off 2026-07-10)
+**Thesis (single, ex-ante — no day-of-week sweep, no window variants):** crypto returns
+over the low-liquidity TradFi weekend differ from the drift baseline, because institutional
+desks are absent from the US Friday close until the Asia Monday open and the tape is
+retail-flow-driven in between.
+**Window (fixed, UTC, stated once):** enter **Friday 21:00 UTC** (US cash/futures close;
+repo NY-session-close convention), exit **Monday 00:00 UTC** (Tokyo/Asia open). ~51h hold.
+Run on H1 bars (hit the exact boundaries). One window only.
+**Universe:** {BTCUSD, ETHUSD}, both 24/7 (weekend holdable). **Verdict is the POOLED
+BTC+ETH basket; per-symbol salvage ("BTC passed, ETH failed") is pre-declared INVALID.**
+**Direction (two-sided on dev):** the drift-neutral weekend **excess** (raw window return −
+unconditional per-hour drift × 51h) is tested two-sided on development. Sign must be
+**consistent across pre-2022 and post-2022** sub-samples. The sealed holdout is then
+evaluated **one-sided in the dev-established direction**.
+**Sizing:** vol-scaled, risk 0.5%/trade, notional R = 2·ATR_D1 (no intrabar stop — calendar
+hold; R is the risk unit for expectancy).
+**Costs:** round-trip spread + **actual nightly swaps** over the held nights (mode-1;
+Wed triple-swap day is NOT in a Fri→Mon window, so no triple applies — noted).
+**Kill line (ALL three required; economic AND statistical):**
+1. ECONOMIC — pooled net expectancy after all costs ≥ **+0.05 R** (a pre-stated floor, not
+   just significance);
+2. STATISTICAL — pooled drift-neutral excess **|t| ≥ 2.0**;
+3. ROBUSTNESS — excess **same sign** in pre-2022 and post-2022.
+Fail any → thesis closed. Pass all → advance the dev-direction to the sealed holdout.
+**Power:** dev effective N ≈ 307 (powered); pre/post-2022 halves ~154 (sign-consistency).
+**Contamination:** aggregate crypto returns were seen (BTC bull); the drift-neutral EXCESS
+design removes that beta; weekend slices themselves were never inspected. Holdout sealed
+until dev result + sign-consistency are both in. **Status: FINAL.**
+
+### Crypto-calendar — DEV VERDICT: FAILED (2026-07-10)
+`scripts/crypto_weekend.py`, dev only (holdout ≥2024-01-09 sealed). Pooled BTC+ETH,
+N=132 weekends (Fri21:00→Mon00:00 UTC, drift-neutral excess). **excess mean −0.00488,
+t=−1.80 (|t|<2 → statistical FAIL); pre-2022 excess +0.00873 vs post-2022 −0.00839 →
+SIGN FLIP → consistency FAIL.** Economic net +0.086R passed the floor but is moot (2 of 3
+gates failed). **DEV FAIL → thesis closed; holdout NOT run (sealed shot preserved).** The
+weekend effect existed pre-2022 (retail-bull era) and REVERSED post-2022 — documented
+calendar decay, caught exactly by the pre-registered sign-consistency gate. (Weekend-
+specific N=132 also ran lighter than the 307 all-days estimate — ~66/half — but the sign
+reversal is unambiguous regardless.)
 
 ## Structural thesis 1 — CARRY: PAPER-KILLED (2026-07-10)
 For each FX pair, actual Exness swap yield (mode-1) vs the policy-rate differential
