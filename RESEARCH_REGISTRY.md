@@ -248,6 +248,48 @@ evidence. **The verdict rests solely on the sealed 2.5y holdout (evaluated once,
 given the power math), the honest verdict is "no demonstrable D1 edge reachable on
 Exness" → next is venue (futures) or vehicle change. **Status: registered, not built.**
 
+## D1+ lever, Levers 1+2 (2026-07-10) — swap regimes + H4 G8
+`scripts/cost_regime_g8.py` (`output/cost_regime_g8.csv`). Cost model parameterized per
+symbol/TF: swap regime ∈ {full | zero (swap-free) | fee_after(N_free, fee/night)}. Holds
+MEASURED per TF via frozen C4 (gross, dev-only) — returns NOT inspected on H4, so H4 edge
+stays sealed.
+
+**Lever 1 (swap-free eligibility, D1):** decisive. Under FULL swap 18/21 pass (gold/US30
+marginal at ~0.09R; US500/USTEC/UK100 fail). Under ZERO swap **21/21 pass** (D1 spread-only
+= 0.007–0.056R). So if the account is swap-free on the instruments, the D1 cost constraint
+essentially vanishes and the full universe re-enters. `max_fee_after3` column gives the
+largest after-3-night daily fee each symbol can absorb and still pass — plug the account's
+real terms in to decide. (A fee_after backtest would need a SimBroker cost extension;
+deferred until a regime is chosen.)
+
+**Lever 2 (H4 G8, correct swaps):** H4 holds are SHORT (2.1–4.5 nights) → swap/trade
+collapses → **19/21 pass under full swap** (fail only XAG 0.130, UK100 0.127); robust core
+all pass (BTC 0.020/ETH 0.026/USOIL 0.032/UKOIL 0.050/JP225 0.015), gold 0.053, US30 0.058.
+H4 dev trades ~96–118/symbol → robust core **~539 dev trades** (vs D1 ~159), ~3.4× → the
+power wall is SOLVED on H4. H4 returns were NOT inspected → uncontaminated.
+
+## H4-trend — pre-registration DRAFT (2026-07-10; awaiting sign-off, not built)
+A FRESH hypothesis (not a port of D1-trend): H4 channel-breakout trend, own params/kill line.
+- **Mechanism:** intermediate-term (≈week) breakout/time-series-momentum on trend-bearing
+  classes; same risk-transfer rationale, faster horizon than D1.
+- **Frozen params (ex-ante, H4-native — NOT the D1 L55):** Donchian **L=30** H4 bars (~5
+  trading days), chandelier trail 3×ATR(H4), ATR(21), no vol gate. **Single config, no grid**
+  (avoid multiplicity on the powered data). [L=30 flagged for user sign-off.]
+- **Universe:** PRIMARY (full-swap-safe) = **{BTCUSD, ETHUSD, USOIL, UKOIL, JP225}**;
+  CONDITIONAL on swap-free confirmation (Lever 1) expand to {XAUUSD, US30, US500, USTEC}.
+  OUT: XAG, UK100 (fail H4 G8), FX (literature).
+- **Sizing (fixed ex-ante):** risk 0.5%/trade, stop 3×ATR ⇒ vol-scaled equal risk.
+- **Costs:** per-symbol spread + correct swaps (mode-1) + parameterized regime (full for
+  primary; zero for the swap-free-conditional arm).
+- **Kill line (own):** pooled primary net expR ≤ 0 OR PF < 1.2 → H4-trend closed; also
+  require majority of primary symbols net-positive.
+- **Power:** robust core ~539 dev trades (~372 effective after within-class correlation) ≥
+  the ~200–450 needed (trend σ≈1.7R) → **POWERED**.
+- **Contamination:** D1 per-symbol PnL was seen (C4-D1 split) but **H4 per-symbol PnL has
+  NOT** — only holds/counts. So H4 dev is legitimate primary evidence (walk-forward), with
+  the sealed 2.5y holdout as final confirmation. This is H4's key edge over the D1 shot.
+- **Status: DRAFT, awaiting sign-off. Not built. D1 holdout remains sealed.**
+
 ## G8 — cost-ceiling gate (paper, mandatory before any implementation)
 Derived from the powered negative result (see `TECHNICAL_SEARCH_CONCLUSION.md`).
 For the candidate's TF/symbol/stop: `cost_drag_R ≈ cost_per_ATR / s` (cost_per_ATR
