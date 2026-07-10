@@ -445,6 +445,22 @@ pre-committed handling, **conclude.** The turn-of-month effect is essentially ab
 **Structural budget 3/3 → ALL DEAD (carry, crypto-cal, turn-of-month) → PROJECT CONCLUDES
 as a powered negative result. See PROJECT_CONCLUSION.md.**
 
+## FUTURES PHASE (venue-change reopening; cost-regime re-test of frozen configs only)
+Legitimized by PROJECT_CONCLUSION.md exit (a) lower-cost venue. Hypothesis (singular,
+falsifiable): "the registry's surviving gross edges clear G8 under futures costs." No tuning,
+no new families — frozen configs verbatim. All prior holdouts (incl. sealed D1 CFD holdout)
+stay sealed.
+
+### Phase 0 — capital granularity gate (BLOCKING) — 2026-07-11
+Dollar risk per 1 micro contract at C4-trend stop (3·ATR(D1)), current prices/ATRs:
+MET $24, MBT $661, MCL $957, MES $1,208, MGC $2,838, MNQ $3,495. Min capital for ≤1%
+per market: MET $2.4k, MBT $66k, MCL $96k, MES $121k, MGC $284k, MNQ $350k. Gate = ≥4
+UNCORRELATED markets ≤1%; the 4 frozen-config classes (metal/equity/energy/crypto) all
+required → **binding = micro gold → PASS threshold ≈ $284k** (gold ~$4,100 × 2.3% ATR ×
+10oz). <$284k → <4 uncorrelated → FAIL. **STATUS: awaiting user capital to lock PASS/FAIL;
+Phases 1–2 BLOCKED until it passes.** If FAIL, per brief: STOP, state honest alternative
+(passive index investing) — undercapitalized futures is not a plan.
+
 ## G8 — cost-ceiling gate (paper, mandatory before any implementation)
 Derived from the powered negative result (see `TECHNICAL_SEARCH_CONCLUSION.md`).
 For the candidate's TF/symbol/stop: `cost_drag_R ≈ cost_per_ATR / s` (cost_per_ATR
