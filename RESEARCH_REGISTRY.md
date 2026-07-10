@@ -308,6 +308,47 @@ non-trend/structural-counterparty vehicle change.
 
 ## H4-trend — pre-registration (frozen spec, executed above)
 
+## PROJECT STOPPING RULE (2026-07-10)
+Structural-thesis phase after the technical search + trend lever closed. **Budget: at
+most THREE structural theses paper-scoped.** Full pre-registration (and later code) ONLY
+for a paper-passer (clears cost/G8 + frequency + a credible power path + a real
+counterparty). Dead-on-paper theses do not consume the budget's "pass" slots but ARE
+logged. **If all three die, the project concludes as a powered negative result and we
+write it up as the final deliverable.** Futures is a VENUE option to layer under any
+paper-passer — never itself a thesis. Theses so far: [1] carry (DEAD), [2] turn-of-month
+(conditional — power-marginal), [3] open.
+
+## Structural thesis 1 — CARRY: PAPER-KILLED (2026-07-10)
+For each FX pair, actual Exness swap yield (mode-1) vs the policy-rate differential
+(rates = mid-2026 ESTIMATE): **every pair's best harvestable carry ≤ 0.00%/yr.** Exness
+zeroes the swap on the carry-favorable side (e.g. USDJPY theoretical +3.5%/yr → earn
+0.00%) and charges −1.8% to −4.3%/yr on the other; markup = 100% of the differential.
+No pair pays you to hold the high-yielder → **no carry premium exists on this broker.
+Family closed.** (Does not consume a pass slot.)
+
+## Structural thesis 2 — TURN-OF-MONTH (indices): paper-scope → CONDITIONAL pass
+Counterparty (G2): scheduled month-end institutional flows (index/pension rebalancing,
+inflows, window-dressing) → documented turn-of-month return concentration. Long-only,
+3-night hold (last trading day → ~3rd of next month).
+- **Cost/G8 (R=2·ATR_D1, cost=3·spread+swap_long·H):** at 3n ALL pass — US30 0.054,
+  US500 0.084, USTEC 0.073, UK100 0.087, JP225 0.013R; at 5n US500/USTEC/UK100 fail.
+  Short hold sidesteps the 15–20-night swap wall. **PASS at 3n.**
+- **Frequency:** 12/yr/index; dev ~79 turns/index (JP225 62). Raw ~395 dev trades.
+- **Power (binding caveat):** indices are ~0.8 correlated at month-end → one equity-beta
+  bet sampled monthly → **effective N ≈ months (~79–118), not months×indices.** Adequate
+  ONLY if the per-turn effect ≥ ~0.25R; the effect is known to have SECULARLY DECAYED →
+  likely underpowered. NOT a clean pass.
+- **Verdict:** conditional paper-pass (cost+freq ✓, power marginal). Eligible for a DRAFT
+  pre-registration, but the effect-size/decay is the real gate; the honest verdict would
+  rest on the sealed holdout + forward given effective N is monthly-limited.
+
+### Turn-of-month — pre-registration DRAFT (awaiting sign-off; not built)
+Universe {US30, US500, USTEC, UK100, JP225}; long at last-trading-day close, exit 3rd
+trading day of next month; vol-scaled 0.5%/trade, stop 2·ATR_D1; correct swaps. Single
+rule, no grid. Kill line: pooled net expR ≤ 0 OR PF < 1.3 → closed; require majority of
+indices net-positive. Power caveat above front-and-center. Turn-of-month returns NOT yet
+inspected → clean. **Status: DRAFT.**
+
 ## G8 — cost-ceiling gate (paper, mandatory before any implementation)
 Derived from the powered negative result (see `TECHNICAL_SEARCH_CONCLUSION.md`).
 For the candidate's TF/symbol/stop: `cost_drag_R ≈ cost_per_ATR / s` (cost_per_ATR
