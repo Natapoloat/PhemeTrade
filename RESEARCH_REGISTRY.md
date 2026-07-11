@@ -474,7 +474,28 @@ with a real prior is exit (b) non-price information. FUTURES PHASE CONCLUDES at 
 Paper-scope before code; full pre-registration only for paper-passers; all die → amended
 conclusion stands, capital stays passive. Nothing trades until dev + sealed holdout + forward.
 Slots: [1] COT positioning (STOPPED — 100 non-overlapping trades < 200 band, underpowered),
-[2] Brent-WTI RV (PAPER-KILLED), [3] open. Two dead, one open.
+[2] Brent-WTI RV (PAPER-KILLED), [3] **RESERVED, not spent** (entry-ticket under G9 below).
+**PHASE 3 CONCLUDED 2026-07-11: 2 dead + 1 reserved. Capital passive. Standing posture =
+screen-and-wait, not search.** See PROJECT_CONCLUSION.md futures/non-price addendum.
+
+### G9 — Slot-3 entry ticket (paper gate, BEFORE any other scoping)
+A Slot-3 candidate may consume the reserved slot ONLY if it shows, on paper and up front, ALL:
+- **(a) cadence/power:** daily-or-better NON-OVERLAPPING signal cadence with an honest
+  effective-N estimate landing in the **200–450 band** (COT died here — 100 pooled; compute
+  this FIRST, before any other work, so we don't repeat the overlap surprise).
+- **(b) counterparty:** genuine NON-PRICE information with a stated structural counterparty
+  (who is forced onto the other side, and why).
+- **(c) cost:** G8-passing symbols at the thesis's natural hold (spread + full swap).
+Fail any → the candidate never opens; the slot stays reserved. No build until (a)–(c) pass
+AND a full pre-registration is signed off.
+
+### Slot-3 named front-runner (NOT scoped; awaiting a decision to spend the slot)
+**On-chain / flow data for BTC+ETH** (exchange in/out-flows, stablecoin flows, funding rates).
+Rationale: potentially daily-or-better cadence (helps G9-a), a plausible counterparty (forced
+flow / leverage unwinds), and crypto already clears G8 (large ATR vs swap). **First gate = a
+DATA AUDIT** (source, cost, licensing, history depth, integrity/revisions) — which may kill it
+cheaply (much on-chain/flow data is paywalled, shallow, revised, or exchange-selective).
+Status: **logged as the entry ticket, unscoped.**
 VRP = **venue-blocked** (no options execution on Exness) — logged, does NOT consume a slot.
 
 ### Slot 1 — COT positioning (crude primary, BTC secondary, gold marginal): PAPER-SCOPE
@@ -482,9 +503,12 @@ VRP = **venue-blocked** (no options execution on Exness) — logged, does NOT co
    commercial/nonreportable), **Disaggregated** (2006+, *Managed Money* = spec proxy) for
    physical commodities, **TFF** for financials. Crude (WTI/NYMEX) & gold (COMEX): deep
    (2006+ disagg, 1986+ legacy). **BTC (CME): only ~2018+** (futures launched Dec 2017) → thin.
-   **2025 shutdown gap:** CFTC did not publish during the fall-2025 shutdown → ~4–6 missing
-   weekly COT reports (Oct–Nov 2025), same event as the Oct-2025 NFP/CPI gap; map explicitly,
-   no imputation, no new signal during the gap. **Acquisition needed:** COT CSVs + a longer
+   **2025 shutdown gap — RETRACTED (2026-07-11):** the paper audit claimed CFTC skipped ~4–6
+   weekly COT reports in the fall-2025 shutdown (Oct–Nov 2025). **This was WRONG.** The acquired
+   2006–2026 series shows unbroken weekly cadence (max inter-report gap ≤10 days). Attribution:
+   the claim was extrapolated from the BLS Oct-2025 NFP/CPI gap (`README_calendar.md`) to the
+   CFTC — a different agency that stayed current (or backfilled). No COT gap exists; nothing to
+   map. **Acquisition needed:** COT CSVs + a longer
    crude/gold PRICE series (Exness price only reaches ~2018; 2006+ price needed for power).
    → PASS with data-acquisition caveat.
 2. **Lookahead protocol.** Observation = Tuesday close; release = **Friday 15:30 ET

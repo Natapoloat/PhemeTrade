@@ -128,3 +128,28 @@ change — a different **venue** (futures) or a different **information source**
 — scoped fresh through the G8 gate and the pre-registration protocol. Until such a change, the
 project stands complete: a rigorous, reproducible, powered negative result, with the holdout
 sealed and the infrastructure ready for the next genuinely different idea.
+
+## 9. Addendum — the two reopenings were tried and closed (2026-07-11)
+
+Both G8 exits named in §8 were pursued under full discipline. Both closed.
+
+- **Exit (a) — venue change to futures.** Blocked at the **capital-granularity gate (Phase 0)**:
+  running the frozen basket at ≤1% risk with 1-contract granularity across ≥4 uncorrelated
+  markets needs ≈ **$284k** (binding = micro gold at current levels); available capital falls
+  short. And even if funded, the prior was weak — the swap-mode bug meant the trend backtests
+  were *already* zero-financing, and the closest analog (H4 trend, no-FX subset) was a powered
+  null (t=+0.09) with gross PF ≤ 1.21. Venue change removes cost it had already (accidentally)
+  removed; it does not create an absent gross edge.
+- **Exit (b) — non-price information (Phase 3, 3-slot budget).** **Closed 2 dead + 1 reserved:**
+  *Carry* — paper-killed (broker zeroes the favorable swap side; 100% markup). *Brent–WTI RV* —
+  paper-killed (two-leg cost ≫ G8 on a low-vol spread). *COT positioning* — passed cost/lookahead/
+  data (real CFTC 2006–2026 acquired, hashed) but **failed the honest power gate**: only **100
+  non-overlapping crude+gold trades over 17y**, well below the 200–450 band. *VRP* — venue-blocked
+  (no options on Exness). Slot 3 is **RESERVED, not spent**, behind gate **G9** (daily-or-better
+  non-overlapping cadence with effective-N in-band **first**, non-price counterparty, G8-passing).
+
+**Standing posture: screen-and-wait, not search.** The default allocation is **passive**. Nothing
+is traded, and no further scoping is opened, unless a candidate clears G9 up front and then a full
+pre-registration → sealed holdout → forward test. Correction on record: an earlier claim of a
+2025 CFTC/COT publication gap was **wrong and retracted** — that shutdown affected BLS releases,
+not the COT series, which is unbroken 2006–2026.
