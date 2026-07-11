@@ -470,6 +470,57 @@ swap (already absent in those results) + trims spread + drops the FX losers, but
 manufacture a gross edge that was not there. Venue change = exit (a); the unspent lever
 with a real prior is exit (b) non-price information. FUTURES PHASE CONCLUDES at Phase 0.
 
+## PHASE 3 — NON-PRICE INFORMATION (exit b; new 3-slot budget, same stopping rule)
+Paper-scope before code; full pre-registration only for paper-passers; all die → amended
+conclusion stands, capital stays passive. Nothing trades until dev + sealed holdout + forward.
+Slots: [1] COT positioning (PAPER-PASS → draft), [2] Brent-WTI RV (PAPER-KILLED), [3] open.
+VRP = **venue-blocked** (no options execution on Exness) — logged, does NOT consume a slot.
+
+### Slot 1 — COT positioning (crude primary, BTC secondary, gold marginal): PAPER-SCOPE
+1. **Data audit.** CFTC COT, free weekly (cftc.gov): **Legacy** (1986+, commercial/non-
+   commercial/nonreportable), **Disaggregated** (2006+, *Managed Money* = spec proxy) for
+   physical commodities, **TFF** for financials. Crude (WTI/NYMEX) & gold (COMEX): deep
+   (2006+ disagg, 1986+ legacy). **BTC (CME): only ~2018+** (futures launched Dec 2017) → thin.
+   **2025 shutdown gap:** CFTC did not publish during the fall-2025 shutdown → ~4–6 missing
+   weekly COT reports (Oct–Nov 2025), same event as the Oct-2025 NFP/CPI gap; map explicitly,
+   no imputation, no new signal during the gap. **Acquisition needed:** COT CSVs + a longer
+   crude/gold PRICE series (Exness price only reaches ~2018; 2006+ price needed for power).
+   → PASS with data-acquisition caveat.
+2. **Lookahead protocol.** Observation = Tuesday close; release = **Friday 15:30 ET
+   (~19:30–20:30 UTC)**. A COT signal is actionable ONLY from the Friday release; entry = first
+   D1 bar at/after that instant; NEVER backdate to the Tuesday date (~3-day lag). Holiday-
+   delayed releases timestamp to actual; publication-gap weeks → no new entries. → PASS.
+3. **G8 at COT-natural holds (2–6 wk, full swap, R=2·ATR_D1).** Crude: PASS both directions
+   all holds (≤0.067R — tiny swap vs ATR). BTC: short all; long ≤4wk (0.086R), FAIL at 6wk
+   (0.126R). Gold: short all; long ≤4wk, FAIL at 6wk. → PASS (crude clean; BTC/gold long-hold
+   capped ≤4wk). The large ATRs absorb the swap — unlike the D1 trend wall.
+4. **Power.** Extreme-threshold signals ~4–10/yr/market; 2–6wk holds → ~5–15 distinct/yr.
+   Crude+gold with 2006+ price ~150–300 signals (POWERED, in 200–450 band); Exness-only
+   (2018+) ~50–80 (borderline); BTC ~30–50 (thin). Holdout (2.5y) ~15–25 signals (thin →
+   confirmatory, not decisive). → CONDITIONAL PASS: powered IFF longer crude/gold price
+   acquired; else borderline. **All four gates pass (power conditional on acquisition).**
+
+### Slot 1 COT — pre-registration DRAFT (awaiting sign-off + data acquisition; not built)
+**Thesis (single, ex-ante):** Managed-Money positioning extremes fade — spec crowding
+precedes reversal; the structural counterparty is commercial hedgers (documented smart-money-
+vs-specs). **Universe:** crude (primary), BTC (secondary), gold (marginal); **POOLED verdict,
+per-symbol salvage pre-declared INVALID.** **Signal (one rule, no sweep):** Managed-Money net
+% of open interest, percentiled over a trailing 3y window; enter when in the top/bottom 20%
+tail, **fading** it (two-sided). **Timestamp:** Friday release, entry first D1 bar after.
+**Exit (one, pre-registered):** positioning normalizes past the 50th pct OR a 6-week cap
+(BTC 4-week cap per G8); stop 2·ATR_D1. **Costs:** Exness spread + full swap. **Kill line (all
+three):** economic pooled net ≥ +0.05R, statistical |t| ≥ 2, sign-consistent pre/post-2020.
+**Power caveat + data prerequisite** front-and-center. **Contamination:** crude/BTC/gold PRICE
+returns were seen extensively (trend runs) but never COT-conditioned slices; the signal is
+orthogonal to the price patterns tested. Holdout sealed. **Status: DRAFT.**
+
+### Slot 2 — Brent–WTI RV: PAPER-KILLED (2026-07-11)
+Two-leg cost model (double round-trip spread + per-leg swap) on the Brent–WTI spread
+(daily ATR 0.55, R=2·ATR=1.10): **cost_drag_R = 0.169 @10n / 0.250 @20n — ≫ 0.10 ceiling.**
+The spread's low vol can't carry the doubled crossing + short-leg swap over mean-reversion
+holds. Cost-dominated → dead, do NOT build. (Regime risk — Brent–WTI blows out on
+logistics/geopolitics — is moot; it fails on cost first.) Does not consume a pass slot.
+
 ## G8 — cost-ceiling gate (paper, mandatory before any implementation)
 Derived from the powered negative result (see `TECHNICAL_SEARCH_CONCLUSION.md`).
 For the candidate's TF/symbol/stop: `cost_drag_R ≈ cost_per_ATR / s` (cost_per_ATR
