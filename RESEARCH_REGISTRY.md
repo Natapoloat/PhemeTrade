@@ -457,9 +457,18 @@ MET $24, MBT $661, MCL $957, MES $1,208, MGC $2,838, MNQ $3,495. Min capital for
 per market: MET $2.4k, MBT $66k, MCL $96k, MES $121k, MGC $284k, MNQ $350k. Gate = ≥4
 UNCORRELATED markets ≤1%; the 4 frozen-config classes (metal/equity/energy/crypto) all
 required → **binding = micro gold → PASS threshold ≈ $284k** (gold ~$4,100 × 2.3% ATR ×
-10oz). <$284k → <4 uncorrelated → FAIL. **STATUS: awaiting user capital to lock PASS/FAIL;
-Phases 1–2 BLOCKED until it passes.** If FAIL, per brief: STOP, state honest alternative
-(passive index investing) — undercapitalized futures is not a plan.
+10oz). <$284k → <4 uncorrelated → FAIL. **STATUS: FAILED 2026-07-11.** User capital in $100k–$284k → only 3 uncorrelated markets
+(equity/energy/crypto) at ≤1%; micro gold (~1.1–1.7% at this capital) short of the metal
+leg → <4 uncorrelated. **Gate FAIL → Phases 1–2 do NOT proceed** (per the blocking rule).
+Passing level ≈ $284k (gold-bound at gold ~$4,100). Honest alternative stated: passive
+index investing. Deeper prior (informed-decision note, not a moved goalpost): even if
+funded, the Phase-2 prior is WEAK — the closest analog already run, H4-trend on the
+trend-friendly subset {BTC,ETH,USOIL,UKOIL,JP225}, was computed with ZERO swaps (the
+swap-mode bug) i.e. already futures-like on financing, and was powered-NULL (t=+0.09);
+and gross PFs were ≤1.21 (< the 1.3 deployable bar even frictionless). Futures removes
+swap (already absent in those results) + trims spread + drops the FX losers, but does not
+manufacture a gross edge that was not there. Venue change = exit (a); the unspent lever
+with a real prior is exit (b) non-price information. FUTURES PHASE CONCLUDES at Phase 0.
 
 ## G8 — cost-ceiling gate (paper, mandatory before any implementation)
 Derived from the powered negative result (see `TECHNICAL_SEARCH_CONCLUSION.md`).
