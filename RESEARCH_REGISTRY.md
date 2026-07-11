@@ -488,6 +488,14 @@ A Slot-3 candidate may consume the reserved slot ONLY if it shows, on paper and 
 - **(c) cost:** G8-passing symbols at the thesis's natural hold (spread + full swap).
 Fail any → the candidate never opens; the slot stays reserved. No build until (a)–(c) pass
 AND a full pre-registration is signed off.
+- **(d) combination rule (amended 2026-07-11):** price × non-price signal combination is
+  admissible ONLY in the **non-frequency-reducing form** — a **daily-cadence non-price BASE
+  signal**, with price used **solely for execution timing or sizing**, NEVER as an entry
+  AND-gate. An intersection (non-price AND price) collapses cadence and would re-fail G9(a)
+  (the COT precedent: overlap/AND-gating halved the count to 100). Any admissible combination
+  is **ONE pre-registered hypothesis** with an ex-ante rationale for that *specific* pairing —
+  **no combinatorial sweeps over family × state pairs.** Operationally unchanged: front-runner
+  stays on-chain BTC+ETH, first gate stays the data audit, slot stays reserved.
 
 ### Slot-3 named front-runner (NOT scoped; awaiting a decision to spend the slot)
 **On-chain / flow data for BTC+ETH** (exchange in/out-flows, stablecoin flows, funding rates).
