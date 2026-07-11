@@ -473,7 +473,8 @@ with a real prior is exit (b) non-price information. FUTURES PHASE CONCLUDES at 
 ## PHASE 3 — NON-PRICE INFORMATION (exit b; new 3-slot budget, same stopping rule)
 Paper-scope before code; full pre-registration only for paper-passers; all die → amended
 conclusion stands, capital stays passive. Nothing trades until dev + sealed holdout + forward.
-Slots: [1] COT positioning (PAPER-PASS → draft), [2] Brent-WTI RV (PAPER-KILLED), [3] open.
+Slots: [1] COT positioning (STOPPED — 100 non-overlapping trades < 200 band, underpowered),
+[2] Brent-WTI RV (PAPER-KILLED), [3] open. Two dead, one open.
 VRP = **venue-blocked** (no options execution on Exness) — logged, does NOT consume a slot.
 
 ### Slot 1 — COT positioning (crude primary, BTC secondary, gold marginal): PAPER-SCOPE
@@ -500,19 +501,35 @@ VRP = **venue-blocked** (no options execution on Exness) — logged, does NOT co
    confirmatory, not decisive). → CONDITIONAL PASS: powered IFF longer crude/gold price
    acquired; else borderline. **All four gates pass (power conditional on acquisition).**
 
-### Slot 1 COT — pre-registration DRAFT (awaiting sign-off + data acquisition; not built)
-**Thesis (single, ex-ante):** Managed-Money positioning extremes fade — spec crowding
-precedes reversal; the structural counterparty is commercial hedgers (documented smart-money-
-vs-specs). **Universe:** crude (primary), BTC (secondary), gold (marginal); **POOLED verdict,
-per-symbol salvage pre-declared INVALID.** **Signal (one rule, no sweep):** Managed-Money net
-% of open interest, percentiled over a trailing 3y window; enter when in the top/bottom 20%
-tail, **fading** it (two-sided). **Timestamp:** Friday release, entry first D1 bar after.
-**Exit (one, pre-registered):** positioning normalizes past the 50th pct OR a 6-week cap
-(BTC 4-week cap per G8); stop 2·ATR_D1. **Costs:** Exness spread + full swap. **Kill line (all
-three):** economic pooled net ≥ +0.05R, statistical |t| ≥ 2, sign-consistent pre/post-2020.
-**Power caveat + data prerequisite** front-and-center. **Contamination:** crude/BTC/gold PRICE
-returns were seen extensively (trend runs) but never COT-conditioned slices; the signal is
-orthogonal to the price patterns tested. Holdout sealed. **Status: DRAFT.**
+### Slot 1 COT — FINALIZED (4 amendments) → STOPPED at the amendment-2 power gate (2026-07-11)
+**Thesis (single, ex-ante):** Managed-Money positioning extremes precede abnormal forward
+returns; structural counterparty = commercial hedgers vs crowded specs. **Universe/verdict
+(amend 4): POOLED = CRUDE + GOLD ONLY; BTC excluded from the verdict, tracked as exhibit.**
+**Direction (amend 1): TWO-SIDED — NOT pre-committed to fade.** Extremes → abnormal forward
+return, sign unknown; dev establishes the sign; pre/post sign-consistency gate; holdout
+one-sided in the dev direction. **Signal:** Managed-Money net %OI, trailing-3y percentile;
+extreme = top/bottom 20% quintile. **Overlap rule (amend 2, ex-ante):** entry ONLY on the
+**transition into** the extreme quintile; one position per market; time-cap exit **6w crude /
+4w gold-long** (per G8); re-entry cooldown. **Timestamp:** Friday 15:30 ET release, entry
+first D1 bar after — never the Tuesday observation. **Data plan (amend 3, two-regime):** DEV
+on 2006+ proxy price (WTI = FRED `DCOILWTICO` spot; gold = FRED `GOLDAMGBD228NLBM` London AM
+fix — adjustment caveat: spot/fix ≠ front-future, basis noise) with G8 costs applied
+synthetically; HOLDOUT + FORWARD on actual Exness bars; boundary logged. **Kill line:** econ
+pooled net ≥ +0.05R AND |t| ≥ 2 AND sign-consistent pre/post-2020. Contamination: price
+returns seen (trend runs), COT-conditioned slices never.
+
+**DATA ACQUIRED (self):** CFTC Disaggregated Futures-Only, WTI(067651)+gold(088691) Managed
+Money net %OI, **1048 weekly obs each, 2006-06-13→2026-07-07.** Source: cftc.gov historical
+(`fut_disagg_txt_hist_2006_2016.zip` sha `7479f97a8b07df98`; yearly `fut_disagg_txt_YYYY.zip`
+2017-2026, e.g. 2026 sha `97728ed087feccb2`). **No 2025 shutdown gap in the COT series**
+(weekly cadence held — correction to the audit). Pipeline caveat: yearly-file header variance
+(`Report_Date` naming) must be normalized before any build.
+
+**AMENDMENT-2 POWER RESTATEMENT (non-overlapping): crude 53 + gold 47 = 100 pooled trades over
+~17y post-warmup — BELOW the 200–450 band → UNDERPOWERED.** Overlap had inflated the earlier
+150–300; one-position/transition-entry/cooldown halves it. A 2.5y holdout holds ~5–10 trades
+(useless). **Per amend-2's pre-committed rule → STOP before building. Slot 1 COT is closed:
+paper-passes cost/lookahead/data but FAILS the honest power gate. NOT built; no holdout opened.**
 
 ### Slot 2 — Brent–WTI RV: PAPER-KILLED (2026-07-11)
 Two-leg cost model (double round-trip spread + per-leg swap) on the Brent–WTI spread
