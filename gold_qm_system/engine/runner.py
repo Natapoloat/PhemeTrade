@@ -114,13 +114,18 @@ def run_backtest(cfg: SystemConfig, entry_bars: pd.DataFrame,
 def run_feed(cfg: SystemConfig, feed: Iterable[tuple[pd.Timestamp, float, float, float, float]],
              calendar: Optional[NewsCalendar] = None,
              on_event: Optional[Any] = None,
-             broker: Optional[Any] = None) -> RunResult:
+             broker: Optional[Any] = None,
+             strategy_factory: Optional[Any] = None) -> RunResult:
     """Paper/forward-test (default SimBroker) or LIVE (inject a real
     BrokerAdapter): identical loop, bars arrive from a real-time feed.
-    The feed must yield CLOSED entry-TF bars (open_time, o, h, l, c)."""
+    The feed must yield CLOSED entry-TF bars (open_time, o, h, l, c).
+    `strategy_factory` selects the signal logic (defaults to QMStrategy); the
+    SAME factory used in the backtest must be used live — the whole point of the
+    shared code path."""
     if broker is None:
         broker = SimBroker(cfg.account.initial_equity, cfg.costs)
-    return _run_core(cfg, feed, broker, calendar, on_event=on_event)
+    return _run_core(cfg, feed, broker, calendar, on_event=on_event,
+                     strategy_factory=strategy_factory)
 
 
 def _settle_end_of_data(cfg: SystemConfig, broker: SimBroker,

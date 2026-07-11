@@ -1,0 +1,51 @@
+# FROZEN C4-trend config for Phase 4 Track A (demo-live). VERBATIM from the registry
+# (RESEARCH_REGISTRY.md -> C4 channel-breakout benchmark). DO NOT MODIFY the signal
+# block. Track A hashes this file at every session start and logs the hash; any change
+# invalidates the run's reproducibility claim.
+#
+# The C4-trend "strategy" = gold_qm_system/engine/channel_breakout.py::make_c4_factory
+# with the params below, on D1 bars, per-symbol cost-calibrated at runtime.
+
+meta:
+  strategy: C4-trend
+  source: RESEARCH_REGISTRY.md (channel-breakout, frozen L55/no-gate)
+  phase: 4-track-A-demo-live
+  signal_frozen: true          # engine plumbing may change; these params may NOT
+
+signal:                         # <-- FROZEN. channel_breakout params, verbatim.
+  lookback: 55                  # Donchian L
+  pctile_lo: 0.0                # ATR-percentile band: no vol gate (best of the grid)
+  pctile_hi: 1.0
+  trail_atr_mult: 3.0           # chandelier ATR-trailing exit
+  atr_period: 21
+
+timeframes:
+  entry: D1                     # the trend timeframe
+  setup: D1
+  directional: D1
+
+universe:                       # cost-robust basket (metals/energy/index/crypto)
+  - BTCUSDm
+  - ETHUSDm
+  - USOILm
+  - UKOILm
+  - JP225m
+
+sizing:                         # vol-scaled: risk 0.5% of demo balance, stop = 3xATR(D1)
+  risk_pct: 0.005
+  # stop distance = trail_atr_mult x ATR(D1) is set by the strategy; size = risk / stop.
+  min_size: 0.0                 # demo: granularity-free R (broker min_lot applied live)
+  size_step: 0.0
+
+costs:                          # per-symbol calibrated at runtime from MT5 spec:
+  model: per_symbol_runtime     # spread from live spread; SWAP (mode==1) accrues on demo
+  swap_mode_note: "swaps accrue on the demo account; log them, they are data"
+
+execution:
+  order_type: market_next_open  # backtest fill model: market order on next D1 bar open
+  base_config: forwardtest_iter3_config.yaml   # account/kill_switch defaults inherited
+
+kill_switches:
+  daily_loss_R: 3.0             # basket-wide daily loss halt (Track A A2)
+  manual_halt_flag: live/HALT   # presence of this file = stop new entries
+  reconcile_mismatch_halt: true # system state != broker state -> halt
